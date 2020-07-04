@@ -1,28 +1,38 @@
 package com.github.tcgeneric.wargame.core
 
 import com.github.tcgeneric.wargame.Wargame
-import com.github.tcgeneric.wargame.behaviors.EntityBehavior
+import com.github.tcgeneric.wargame.events.TurnCompletionEvent
+import com.github.tcgeneric.wargame.events.TurnStartEvent
+import com.github.tcgeneric.wargame.events.TurnTimeEndEvent
 import org.bukkit.Bukkit
-import java.util.*
+import org.bukkit.event.EventHandler
+import org.bukkit.scheduler.BukkitRunnable
 
 class TurnHandler(private val instance:Wargame) {
 
-    private val behaviorQueue = LinkedList<EntityBehavior>()
-    var turn = 0
+    private var turn:Int = 0
 
-    fun nextTurn() {
-        while(behaviorQueue.peek() != null) {
-            instance.behaviorHandler.handle(behaviorQueue.pop())
+    @EventHandler
+    fun onTurnCompletion(e:TurnCompletionEvent) {
+        startTimer(20)
+        turn = e.turn
+        // TODO: If there's no problem, execute this
+        Bukkit.getServer().pluginManager.callEvent(TurnStartEvent(turn))
+    }
+
+    fun startTimer(second:Int) {
+        Bukkit.getServer().scheduler.runTaskTimer(instance, TurnTimer(second, {}) {
+            Bukkit.getServer().pluginManager.callEvent(TurnTimeEndEvent(turn))
+        }, 0, 20L)
+    }
+
+    private class TurnTimer(var second:Int, val callback: (time:Int) -> Unit, val endCallback:() -> Unit):BukkitRunnable() {
+        override fun run() {
+            if(--second <= 0) {
+                this.cancel()
+                endCallback
+            }
+            callback(second)
         }
-        // TODO: Propagate TurnElapseEvent
-        turn++
-    }
-
-    fun addReservedBehavior(entityBehavior: EntityBehavior) {
-        behaviorQueue.add(entityBehavior)
-    }
-
-    fun removeReservedBehavior(entityBehavior: EntityBehavior) {
-        behaviorQueue.remove(entityBehavior)
     }
 }

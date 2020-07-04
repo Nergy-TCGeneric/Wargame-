@@ -7,6 +7,10 @@ class UnitGroup {
 
     private val units:LinkedList<Unit> = LinkedList()
 
+    constructor(first:Unit) {
+        units.add(first)
+    }
+
     constructor(first:Unit, second:Unit) {
         units.add(first)
         units.add(second)
