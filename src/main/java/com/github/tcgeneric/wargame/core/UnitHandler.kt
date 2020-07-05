@@ -3,39 +3,81 @@ package com.github.tcgeneric.wargame.core
 import com.github.tcgeneric.wargame.Wargame
 import com.github.tcgeneric.wargame.entity.units.*
 import com.github.tcgeneric.wargame.entity.units.Unit
-import com.github.tcgeneric.wargame.map.Tile
-import java.util.*
-import kotlin.collections.HashMap
+import java.lang.IllegalArgumentException
 
-class UnitHandler(val instance:Wargame) {
+class UnitHandler(private val instance:Wargame) {
 
-    private val unitList:HashMap<UUID, Unit> = HashMap()
     private var id = 0
+    private val unitFactory:UnitFactory = UnitFactory()
 
-    fun divideUnit(unit: Unit, amount:Int):Pair<Unit, Unit> {
-        // val newUnit = Unit(unit.combatRange, unit.combatStrength, unit.moral, amount, unit.parentTile)
-        // TODO: This code is stub; replace it later
-        return Pair(unit, unit)
+    // Assuming that every unit is on its owner(player)'s sight
+
+    fun divideUnitTo(unit: Unit, amount:Int, coord:Pair<Int, Int>):Boolean {
+        if(instance.mapHandler.isEntityOnMap(unit) &&
+                amount > 0 &&
+                unit.amount > amount &&
+                instance.mapHandler.canUnitMoveTo(coord)) {
+            val newUnit = createUnitFrom(unit, amount)
+            unit.amount -= amount
+            return instance.mapHandler.createEntityOn(newUnit, coord)
+        }
+        return false
     }
 
-    fun divideUnit(unitGroup:UnitGroup, target: Unit):Pair<Unit, UnitGroup> {
-        unitGroup.removeUnit(target)
-        return Pair(target, unitGroup)
+    fun divideUnitTo(unitGroup:UnitGroup, target: Unit, coord:Pair<Int, Int>):Boolean {
+        if(instance.mapHandler.isEntityOnMap(unitGroup) &&
+                unitGroup.contains(target) &&
+                instance.mapHandler.canUnitMoveTo(coord)) {
+            unitGroup.removeUnit(target)
+            return instance.mapHandler.createEntityOn(target, coord)
+        }
+        return false
     }
 
-    fun mergeUnit(first:Unit, second:Unit):UnitGroup {
-        return UnitGroup(first, second)
+    fun mergeUnit(first:Unit, second:Unit):Boolean {
+        return mergeUnit(first, createUnitGroup(second))
     }
 
-    fun moveUnit(unit:Unit, coord:Pair<Int, Int>) {
-        instance.mapHandler.moveUnitTo(unit, coord)
+    // At first, first unit moves to second unit's position. and then merge happens.
+    fun mergeUnit(first:Unit, second:UnitGroup):Boolean {
+        if(instance.mapHandler.isEntityOnMap(first) &&
+                instance.mapHandler.isEntityOnMap(second) &&
+                instance.mapHandler.isNearUnitMoveRange(first, second.first())) {
+            val group = createUnitGroup(first, second)
+            val pos = instance.mapHandler.getEntityCoordinate(second)
+            if(pos != null) {
+                instance.mapHandler.removeEntity(first)
+                instance.mapHandler.removeEntity(second)
+                return instance.mapHandler.createEntityOn(group, pos)
+            }
+        }
+        return false
+    }
+
+    fun moveUnitTo(unit:Unit, coord:Pair<Int, Int>):Boolean {
+        if(instance.mapHandler.canUnitMoveTo(coord))
+            return instance.mapHandler.moveUnitTo(unit, coord)
+        return false
     }
 
     fun createUnit(type:UnitType, amount:Int):Unit {
-        return when(type) {
-            UnitType.COMBAT -> CombatUnit(id++, 5, 3, 1, amount) // TODO: Stub code
-            UnitType.WORKER -> WorkerUnit(id++, 5, 3, 1, amount) // TODO: Stub code
-        }
+        return unitFactory.createUnit(id++, type, amount)
+    }
+
+    fun createUnitFrom(unit:Unit, amount:Int):Unit {
+        return unitFactory.createUnitFrom(id++, unit, amount)
+    }
+
+    fun createUnitGroup(first:Unit):UnitGroup {
+        return UnitGroup(id++, first)
+    }
+
+    fun createUnitGroup(first:Unit, second:Unit):UnitGroup {
+        return UnitGroup(id++, first, second)
+    }
+
+    fun createUnitGroup(first:Unit, second:UnitGroup):UnitGroup {
+        return UnitGroup(id++, first, second)
     }
 
     /*
