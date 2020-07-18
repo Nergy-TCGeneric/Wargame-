@@ -4,4 +4,4 @@ import com.github.tcgeneric.wargame.entity.units.Unit
 import com.github.tcgeneric.wargame.entity.units.UnitGroup
 import org.bukkit.entity.Player
 
-class UnitMergeBehavior(id:Int, actor:Unit, player:Player, val target:UnitGroup):UnitBehavior(id, actor, player)
+class UnitMergeBehavior(actor:Unit, player:Player, time:Long, val target:UnitGroup):UnitBehavior(actor, player, time)

@@ -16,4 +16,12 @@ data class Coordinate(var x:Int, var z:Int) {
     fun add(x:Int, z:Int):Coordinate {
         return add(x, z)
     }
+
+    override fun equals(other: Any?): Boolean {
+        return super.equals(other)
+    }
+
+    override fun hashCode(): Int {
+        return 31 * x * x + 7 * z
+    }
 }

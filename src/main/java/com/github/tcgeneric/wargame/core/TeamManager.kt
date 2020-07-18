@@ -16,6 +16,10 @@ class TeamManager(private val instance:Wargame) {
         return null
     }
 
+    fun showTeamSight() {
+
+    }
+
     /*
     fun addPlayerTo(player: Player, team:Team):Boolean {
 

@@ -3,6 +3,7 @@ package com.github.tcgeneric.wargame.entity.units
 import com.github.tcgeneric.wargame.entity.Entity
 import com.github.tcgeneric.wargame.map.Tile
 import com.github.tcgeneric.wargame.teams.Team
+import org.bukkit.entity.Player
 
 abstract class Unit(id:Int):Entity(id) {
     open var combatRange:Int = 0

@@ -1,11 +1,11 @@
 package com.github.tcgeneric.wargame.listener
 
 import com.github.tcgeneric.wargame.Wargame
-import com.github.tcgeneric.wargame.events.EntityMoveEvent
+import com.github.tcgeneric.wargame.entity.units.Unit
+import com.github.tcgeneric.wargame.events.UnitMoveEvent
 import com.github.tcgeneric.wargame.events.EntitySelectEvent
 import com.github.tcgeneric.wargame.events.TileSelectEvent
 import com.github.tcgeneric.wargame.events.UnitInteractionEvent
-import com.github.tcgeneric.wargame.util.Selection
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -24,23 +24,24 @@ class RightClickEventListener(private val instance:Wargame)
         val tile = instance.mapHandler.getTile(coord) ?: return
         if(!instance.mapHandler.isOnPlayerSight(tile, player)) return
 
-        if(pData?.selected == null) {
+        // TODO: Explicit rule is required
+        if(pData?.selectedTile == null) {
             when(tile.entity) {
                 null -> Bukkit.getPluginManager().callEvent(TileSelectEvent(player, tile))
-                else -> {
-                    pData?.selected = Selection(coord, tile.entity!!)
-                    Bukkit.getPluginManager().callEvent(EntitySelectEvent(player, tile.entity!!))
-                }
+                else -> Bukkit.getPluginManager().callEvent(EntitySelectEvent(player, tile.entity!!))
             }
-        } else if(pData.selected!!.entity != null) {
-            if(pData.selected!!.entity == tile.entity) return
+        } else {
+            val pEntity = pData.selectedTile!!.entity
+            if(pEntity == tile.entity && pEntity != null) return
             when(tile.entity) {
                 null -> {
-                    val tCoord = instance.mapHandler.findTileCoord(tile)!!
-                    Bukkit.getPluginManager().callEvent(EntityMoveEvent(pData.selected!!.entity!!, tCoord))
+                    if(pEntity is Unit)
+                        Bukkit.getPluginManager().callEvent(UnitMoveEvent(pEntity, tile))
                 }
-                // TODO: This code is stub; replace with actual value
-                else -> Bukkit.getPluginManager().callEvent(UnitInteractionEvent())
+                else -> {
+                    if(pEntity is Unit)
+                        Bukkit.getPluginManager().callEvent(UnitInteractionEvent(pEntity, tile.entity!!))
+                }
             }
         }
     }

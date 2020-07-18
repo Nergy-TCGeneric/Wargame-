@@ -3,7 +3,6 @@ package com.github.tcgeneric.wargame.core
 import com.github.tcgeneric.wargame.Wargame
 import com.github.tcgeneric.wargame.behaviors.*
 import com.github.tcgeneric.wargame.effects.UnitAttackEffect
-import com.github.tcgeneric.wargame.effects.UnitDivideEffect
 import com.github.tcgeneric.wargame.effects.UnitMergeEffect
 import com.github.tcgeneric.wargame.effects.UnitMoveEffect
 import com.github.tcgeneric.wargame.events.TurnCalculationEndEvent
@@ -25,6 +24,14 @@ class BehaviorHandler(private val instance:Wargame) {
         Bukkit.getServer().pluginManager.callEvent(TurnCalculationEndEvent(e.turn))
     }
 
+    fun queue(behavior:UnitBehavior) {
+        behaviorQueue.add(behavior)
+    }
+
+    fun cancel(behavior:UnitBehavior) {
+        behaviorQueue.remove(behavior)
+    }
+
     private fun sort() {
         // TODO: Sort behavior by given priority(Read the note)
     }
@@ -32,7 +39,7 @@ class BehaviorHandler(private val instance:Wargame) {
     private fun handle(behavior:UnitBehavior):Boolean {
         return when(behavior) {
             is UnitAttackBehavior -> {
-                // TODO: Check if given target is on map. if does, calculate casualities and apply
+                instance.unitHandler
                 instance.displayHandler.addReservedEffect(UnitAttackEffect(behavior.actor, behavior.target))
                true
             }
@@ -47,10 +54,10 @@ class BehaviorHandler(private val instance:Wargame) {
                 true
             }
             is UnitMoveBehavior -> {
-                if(instance.mapHandler.isPassableTile(behavior.coord)
-                        && instance.mapHandler.isNearUnitMoveRange(behavior.actor, behavior.coord)) {
-                    instance.mapHandler.moveUnitTo(behavior.actor, behavior.coord)
-                    instance.displayHandler.addReservedEffect(UnitMoveEffect(behavior.actor, behavior.coord))
+                if(behavior.tile.passable
+                        && instance.mapHandler.isNearUnitMoveRange(behavior.actor, behavior.tile.coord)) {
+                    instance.mapHandler.moveUnitTo(behavior.actor, behavior.tile.coord)
+                    instance.displayHandler.addReservedEffect(UnitMoveEffect(behavior.actor, behavior.tile.coord))
                 }
                 false
             }

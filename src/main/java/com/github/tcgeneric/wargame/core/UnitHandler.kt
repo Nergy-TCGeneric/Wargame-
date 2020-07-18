@@ -3,6 +3,7 @@ package com.github.tcgeneric.wargame.core
 import com.github.tcgeneric.wargame.Wargame
 import com.github.tcgeneric.wargame.entity.units.*
 import com.github.tcgeneric.wargame.entity.units.Unit
+import com.github.tcgeneric.wargame.util.Coordinate
 import java.lang.IllegalArgumentException
 
 class UnitHandler(private val instance:Wargame) {
@@ -12,11 +13,11 @@ class UnitHandler(private val instance:Wargame) {
 
     // Assuming that every unit is on its owner(player)'s sight
 
-    fun divideUnitTo(unit: Unit, amount:Int, coord:Pair<Int, Int>):Boolean {
+    fun divideUnitTo(unit: Unit, amount:Int, coord:Coordinate):Boolean {
         if(instance.mapHandler.isEntityOnMap(unit) &&
                 amount > 0 &&
                 unit.amount > amount &&
-                instance.mapHandler.canUnitMoveTo(coord)) {
+                instance.mapHandler.canUnitMoveTo(unit, coord)) {
             val newUnit = createUnitFrom(unit, amount)
             unit.amount -= amount
             return instance.mapHandler.createEntityOn(newUnit, coord)
@@ -24,10 +25,10 @@ class UnitHandler(private val instance:Wargame) {
         return false
     }
 
-    fun divideUnitTo(unitGroup:UnitGroup, target: Unit, coord:Pair<Int, Int>):Boolean {
+    fun divideUnitTo(unitGroup:UnitGroup, target: Unit, coord:Coordinate):Boolean {
         if(instance.mapHandler.isEntityOnMap(unitGroup) &&
                 unitGroup.contains(target) &&
-                instance.mapHandler.canUnitMoveTo(coord)) {
+                instance.mapHandler.canUnitMoveTo(target, coord)) {
             unitGroup.removeUnit(target)
             return instance.mapHandler.createEntityOn(target, coord)
         }
@@ -51,12 +52,6 @@ class UnitHandler(private val instance:Wargame) {
                 return instance.mapHandler.createEntityOn(group, pos)
             }
         }
-        return false
-    }
-
-    fun moveUnitTo(unit:Unit, coord:Pair<Int, Int>):Boolean {
-        if(instance.mapHandler.canUnitMoveTo(coord))
-            return instance.mapHandler.moveUnitTo(unit, coord)
         return false
     }
 
