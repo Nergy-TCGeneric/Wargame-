@@ -1,12 +1,15 @@
 package com.github.tcgeneric.wargame.map
 
 import com.github.tcgeneric.wargame.entity.Entity
-import com.github.tcgeneric.wargame.Resources
+import com.github.tcgeneric.wargame.Resource
 
+// TODO: Remove coord value from MapData. Just store tile data into list.
 data class Tile(
         var entity:Entity?,
         val destructible:Boolean,
         val passable:Boolean,
         var durability:Int,
-        val resource:Resources?
+        val resource:Resource?,
+        var isSynced:Boolean,
+        val coord:Pair<Int, Int>
 )

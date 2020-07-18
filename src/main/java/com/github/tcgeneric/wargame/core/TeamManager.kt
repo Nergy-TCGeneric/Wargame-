@@ -4,7 +4,7 @@ import com.github.tcgeneric.wargame.Wargame
 import com.github.tcgeneric.wargame.teams.Team
 import org.bukkit.entity.Player
 
-class TeamManager(val instance:Wargame) {
+class TeamManager(private val instance:Wargame) {
 
     private val teamList:ArrayList<Team> = ArrayList()
 

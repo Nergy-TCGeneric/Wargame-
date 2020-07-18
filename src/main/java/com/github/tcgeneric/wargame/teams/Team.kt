@@ -1,5 +1,7 @@
 package com.github.tcgeneric.wargame.teams
 
+import com.github.tcgeneric.wargame.Resource
+import com.github.tcgeneric.wargame.ResourceType
 import com.github.tcgeneric.wargame.entity.structures.ControlPoint
 import com.github.tcgeneric.wargame.entity.units.Unit
 import com.github.tcgeneric.wargame.map.MapData
@@ -12,11 +14,9 @@ class Team(val name:String) {
     val players:ArrayList<Player> = ArrayList()
     val units: LinkedList<Unit> = LinkedList()
     lateinit var sight:MapData
-    var woodAmount:Int = 0
-    var maxWoodAmount:Int = 0
-    var foodAmount:Int = 0
-    var maxFoodAmount:Int = 0
-    var ironAmount:Int = 0
-    var maxIronAmount:Int = 0
+    // TODO: Below maxAmount is stub
+    val woods:Resource = Resource(ResourceType.WOOD, 0, 100)
+    val foods:Resource = Resource(ResourceType.FOOD, 0, 100)
+    val irons:Resource = Resource(ResourceType.IRON, 0, 100)
     var maximumUnitAmount:Int = 0
 }
