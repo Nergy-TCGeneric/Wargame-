@@ -6,8 +6,7 @@ import com.github.tcgeneric.wargame.entity.units.Unit
 import com.github.tcgeneric.wargame.events.EntityMoveEvent
 import com.github.tcgeneric.wargame.map.MapData
 import com.github.tcgeneric.wargame.map.Tile
-import com.github.tcgeneric.wargame.teams.Team
-import com.github.tcgeneric.wargame.util.RangedVector
+import com.github.tcgeneric.wargame.util.Coordinate
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.entity.Player
@@ -15,7 +14,7 @@ import kotlin.math.abs
 
 class MapHandler(private val instance:Wargame, private var mapData:MapData) {
 
-    fun createEntityOn(entity:Entity, coord:Pair<Int, Int>):Boolean {
+    fun createEntityOn(entity:Entity, coord:Coordinate):Boolean {
         val tile = mapData.tiles[coordToIdx(coord)]!!
         if(tile.entity != null)
             return false
@@ -32,7 +31,7 @@ class MapHandler(private val instance:Wargame, private var mapData:MapData) {
         return true
     }
 
-    fun moveUnitTo(unit:Unit, coord:Pair<Int, Int>):Boolean {
+    fun moveUnitTo(unit:Unit, coord:Coordinate):Boolean {
         val tile = mapData.tiles[coordToIdx(coord)]!!
         tile.entity = unit
         mapData.entities[unit] = coord
@@ -41,15 +40,15 @@ class MapHandler(private val instance:Wargame, private var mapData:MapData) {
         return true
     }
 
-    fun canUnitMoveTo(coord:Pair<Int, Int>):Boolean {
+    fun canUnitMoveTo(coord:Coordinate):Boolean {
         return isPassableTile(coord) && !isUnit(coord)
     }
 
-    fun isPassableTile(coord:Pair<Int, Int>):Boolean {
+    fun isPassableTile(coord:Coordinate):Boolean {
         return mapData.tiles[coordToIdx(coord)]!!.passable
     }
 
-    fun isUnit(coord:Pair<Int, Int>):Boolean {
+    fun isUnit(coord:Coordinate):Boolean {
         return mapData.tiles[coordToIdx(coord)]!!.entity is Unit
     }
 
@@ -57,7 +56,7 @@ class MapHandler(private val instance:Wargame, private var mapData:MapData) {
         return mapData.entities.containsKey(entity) && mapData.entities[entity] != null
     }
 
-    fun isNearUnitCombatRange(unit:Unit, coord:Pair<Int, Int>):Boolean {
+    fun isNearUnitCombatRange(unit:Unit, coord:Coordinate):Boolean {
         return manhattanDist(unit, coord) <= unit.combatRange
     }
 
@@ -65,7 +64,7 @@ class MapHandler(private val instance:Wargame, private var mapData:MapData) {
         return isNearUnitCombatRange(first, mapData.entities[second]!!)
     }
 
-    fun isNearUnitMoveRange(unit:Unit, coord:Pair<Int, Int>):Boolean {
+    fun isNearUnitMoveRange(unit:Unit, coord:Coordinate):Boolean {
         return manhattanDist(unit, coord) <= unit.moveRange
     }
 
@@ -79,44 +78,47 @@ class MapHandler(private val instance:Wargame, private var mapData:MapData) {
         return t.isSynced
     }
 
-    fun getEntityCoordinate(entity:Entity):Pair<Int, Int>? {
+    fun getEntityCoordinate(entity:Entity):Coordinate? {
         return mapData.entities[entity]
     }
 
-    fun getTile(coord:Pair<Int, Int>): Tile? {
+    fun getTile(coord:Coordinate): Tile? {
         return mapData.tiles[coordToIdx(coord)]
     }
 
-    fun findTileCoord(tile:Tile): Pair<Int, Int>? {
+    fun findTileCoord(tile:Tile): Coordinate? {
         val idx = mapData.tiles.indexOf(tile)
         return if(idx >= 0) idxToCoord(idx)
         else null
     }
 
-    fun getTileVector(coord:Pair<Int, Int>): RangedVector? {
+    fun getTileVector(coord:Coordinate): Coordinate? {
         if(mapData.tiles[coordToIdx(coord)] != null)
-            return mapData.startPoint.add(coord.first, 0, coord.second)
+            return mapData.startPoint.add(coord.x, coord.z)
         return null
     }
 
     fun locToCoord(loc:Location):Pair<Int, Int> {
-        // TODO: Given range is stub; replace with actual value
-        val vec = RangedVector(loc.blockX, loc.blockY, loc.blockZ, 4)
+        val vec = Coordinate(loc.blockX, loc.blockZ)
         val diff = mapData.startPoint.subtract(vec)
         if(diff.x < 0 || diff.z < 0 || diff.x > mapData.width || diff.z > mapData.height)
             throw IllegalStateException("Given coordinate is out of range")
         return Pair(diff.x, diff.z)
     }
 
-    private fun coordToIdx(coord:Pair<Int, Int>):Int { return coord.first * mapData.width + coord.second }
+    fun synchronize(sight:MapData) {
 
-    private fun idxToCoord(idx:Int):Pair<Int, Int> { return Pair(idx / mapData.width, idx % mapData.width)}
+    }
 
-    private fun manhattanDist(entity:Entity, coord:Pair<Int, Int>):Int {
+    private fun coordToIdx(coord:Coordinate):Int { return coord.x * mapData.width + coord.z }
+
+    private fun idxToCoord(idx:Int):Coordinate { return Coordinate(idx / mapData.width, idx % mapData.width)}
+
+    private fun manhattanDist(entity:Entity, coord:Coordinate):Int {
         for(k in mapData.entities.keys) {
             if(k.id == entity.id) {
                 val unitLoc = getEntityCoordinate(k)!!
-                return abs(coord.first - unitLoc.first) + abs(coord.second - unitLoc.second)
+                return abs(coord.x - unitLoc.x) + abs(coord.z - unitLoc.z)
             }
         }
         throw IllegalStateException("Entity without id is present")

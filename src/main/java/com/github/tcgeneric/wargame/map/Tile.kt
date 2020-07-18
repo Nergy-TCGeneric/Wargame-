@@ -2,6 +2,7 @@ package com.github.tcgeneric.wargame.map
 
 import com.github.tcgeneric.wargame.entity.Entity
 import com.github.tcgeneric.wargame.Resource
+import com.github.tcgeneric.wargame.util.Coordinate
 
 // TODO: Remove coord value from MapData. Just store tile data into list.
 data class Tile(
@@ -11,5 +12,5 @@ data class Tile(
         var durability:Int,
         val resource:Resource?,
         var isSynced:Boolean,
-        val coord:Pair<Int, Int>
+        val coord:Coordinate
 )
