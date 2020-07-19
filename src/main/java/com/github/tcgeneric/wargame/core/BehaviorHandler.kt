@@ -3,8 +3,10 @@ package com.github.tcgeneric.wargame.core
 import com.github.tcgeneric.wargame.Wargame
 import com.github.tcgeneric.wargame.behaviors.*
 import com.github.tcgeneric.wargame.effects.UnitAttackEffect
+import com.github.tcgeneric.wargame.effects.UnitDivideEffect
 import com.github.tcgeneric.wargame.effects.UnitMergeEffect
 import com.github.tcgeneric.wargame.effects.UnitMoveEffect
+import com.github.tcgeneric.wargame.entity.units.UnitGroup
 import com.github.tcgeneric.wargame.events.TurnCalculationEndEvent
 import com.github.tcgeneric.wargame.events.TurnTimeEndEvent
 import org.bukkit.Bukkit
@@ -39,13 +41,15 @@ class BehaviorHandler(private val instance:Wargame) {
     private fun handle(behavior:UnitBehavior):Boolean {
         return when(behavior) {
             is UnitAttackBehavior -> {
-                instance.unitHandler
+                // TODO: Needed to change Unitbehavior's parameter.
+                val dmg = instance.unitHandler.getInflictingDamage(behavior.actor, behavior.target)
+                // TODO: Damage entity by using calculated value.
                 instance.displayHandler.addReservedEffect(UnitAttackEffect(behavior.actor, behavior.target))
                true
             }
             is UnitDivideBehavior -> {
-                // TODO: By changing UnitDivideBehavior's parameter, make this handle UnitGroup too.
-//                instance.displayHandler.addReservedEffect(UnitDivideEffect())
+                val ug = behavior.tile.entity as UnitGroup
+                instance.displayHandler.addReservedEffect(UnitDivideEffect(behavior.actor, ug))
                 true
             }
             is UnitMergeBehavior -> {
@@ -59,6 +63,10 @@ class BehaviorHandler(private val instance:Wargame) {
                     instance.mapHandler.moveUnitTo(behavior.actor, behavior.tile.coord)
                     instance.displayHandler.addReservedEffect(UnitMoveEffect(behavior.actor, behavior.tile.coord))
                 }
+                false
+            }
+            is UnitDwellBehavior -> {
+                // TODO: Code goes here
                 false
             }
             else -> throw IllegalArgumentException("Unknown unit behavior type")

@@ -7,4 +7,6 @@ import org.bukkit.entity.Player
 data class PlayerData(val player:Player) {
     var selectedTile: Tile? = null
     var queuedBehavior: UnitBehavior? = null
+    var isDivideMode: Boolean = false
+    var divideAmount: Int = 0
 }

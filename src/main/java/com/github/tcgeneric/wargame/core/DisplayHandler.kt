@@ -18,11 +18,11 @@ class DisplayHandler(private val instance:Wargame) {
         Bukkit.getServer().pluginManager.callEvent(TurnCompletionEvent(e.turn + 1))
     }
 
-    fun addReservedEffect(e:Effect) {
-        effectQueue.add(e)
+    fun addReservedEffect(e:Effect):Boolean {
+        return effectQueue.add(e)
     }
 
-    fun removeReservedEffect(e:Effect) {
-        effectQueue.remove(e)
+    fun removeReservedEffect(e:Effect):Boolean {
+        return effectQueue.remove(e)
     }
 }

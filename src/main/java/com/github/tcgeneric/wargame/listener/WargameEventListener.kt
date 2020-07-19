@@ -1,10 +1,7 @@
 package com.github.tcgeneric.wargame.listener
 
 import com.github.tcgeneric.wargame.Wargame
-import com.github.tcgeneric.wargame.behaviors.UnitAttackBehavior
-import com.github.tcgeneric.wargame.behaviors.UnitBehavior
-import com.github.tcgeneric.wargame.behaviors.UnitMergeBehavior
-import com.github.tcgeneric.wargame.behaviors.UnitMoveBehavior
+import com.github.tcgeneric.wargame.behaviors.*
 import com.github.tcgeneric.wargame.entity.structures.Structure
 import com.github.tcgeneric.wargame.entity.units.Unit
 import com.github.tcgeneric.wargame.entity.units.UnitGroup
@@ -20,7 +17,7 @@ class WargameEventListener(private val instance:Wargame) {
         if(!instance.mapHandler.canUnitMoveTo(e.unit, e.tile.coord)) return
         val b = UnitMoveBehavior(e.unit, e.unit.controller, System.currentTimeMillis(), e.tile)
         instance.behaviorHandler.queue(b)
-        instance.pDataHandler.dataMap[e.unit.controller.uniqueId]?.queuedBehavior = b
+        instance.pDataHandler.dataMap[e.unit.controller.uniqueId]!!.queuedBehavior = b
     }
 
     @EventHandler
@@ -33,18 +30,27 @@ class WargameEventListener(private val instance:Wargame) {
     @EventHandler
     fun onUnitInteraction(e:UnitInteractionEvent) {
         lateinit var b: UnitBehavior
-        if(e.unit.parentTeam == e.target.parentTeam) {
-            when(e.target) {
-                is UnitGroup -> {
-                    b = UnitMergeBehavior(e.unit, e.unit.controller, System.currentTimeMillis(), e.target)
-                    instance.behaviorHandler.queue(b)
+        val currentTime = System.currentTimeMillis()
+        if(e.unit.parentTeam == e.target.entity?.parentTeam) {
+            b = when(val target = e.target.entity) {
+                is Unit -> {
+                    val uGroup = instance.unitHandler.createUnitGroup(target)
+                    UnitMergeBehavior(e.unit, e.unit.controller, currentTime, uGroup)
                 }
-//              is Structure ->
+                is UnitGroup ->
+                    UnitMergeBehavior(e.unit, e.unit.controller, currentTime, target)
+                is Structure ->
+                    UnitDwellBehavior(e.unit, e.unit.controller, currentTime, target)
+                else -> TODO("Not implemented")
             }
         } else {
-            b = UnitAttackBehavior(e.unit, e.unit.controller, System.currentTimeMillis(), e.target)
-            instance.behaviorHandler.queue(b)
+            val pData = instance.pDataHandler.dataMap[e.unit.controller.uniqueId]!!
+            b = when(val target = e.target.entity) {
+                null -> UnitDivideBehavior(e.unit, e.unit.controller, currentTime, e.target, pData.divideAmount)
+                else -> UnitAttackBehavior(e.unit, e.unit.controller, currentTime, target)
+            }
         }
+        instance.behaviorHandler.queue(b)
         instance.pDataHandler.dataMap[e.unit.controller.uniqueId]?.queuedBehavior = b
     }
 }

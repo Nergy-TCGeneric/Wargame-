@@ -58,4 +58,8 @@ class UnitGroup(id:Int):Entity(id) {
         }
         return min.first
     }
+
+    fun size():Int {
+        return units.size
+    }
 }

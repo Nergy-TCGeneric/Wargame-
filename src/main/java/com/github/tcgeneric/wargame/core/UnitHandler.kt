@@ -1,10 +1,13 @@
 package com.github.tcgeneric.wargame.core
 
 import com.github.tcgeneric.wargame.Wargame
+import com.github.tcgeneric.wargame.entity.Entity
+import com.github.tcgeneric.wargame.entity.structures.Structure
 import com.github.tcgeneric.wargame.entity.units.*
 import com.github.tcgeneric.wargame.entity.units.Unit
+import com.github.tcgeneric.wargame.map.Tile
 import com.github.tcgeneric.wargame.util.Coordinate
-import java.lang.IllegalArgumentException
+import kotlin.math.ceil
 
 class UnitHandler(private val instance:Wargame) {
 
@@ -75,9 +78,32 @@ class UnitHandler(private val instance:Wargame) {
         return UnitGroup(id++, first, second)
     }
 
-    /*
-    fun calculateCausalities(first:Unit, second:Unit, firstTile:Tile, secondTile:Tile):Int {
-
+    // TODO: This formula is stub. change it later(it doesn't consider tile's protection rate).
+    fun getInflictingDamage(attacker:Entity?, defender:Entity?):Pair<Int, Int> {
+        if(attacker == null || defender == null) return Pair(0, 0)
+        if(attacker is Unit) {
+            return if(defender is Unit) {
+                Pair(attacker.amount * attacker.combatStrength, defender.amount * defender.combatStrength)
+            } else {
+                Pair(attacker.amount * attacker.combatStrength, 0)
+            }
+        }
+        return Pair(0, 0)
+        /*
+        if(attacking.entity == null || defending.entity == null) return Pair(0, 0)
+        if(attacking.entity is Unit) {
+            val attacker = attacking.entity as Unit
+            return if(defending.entity is Unit) {
+                val defender = defending.entity as Unit
+                val c1 = ceil(attacker.amount * (attacker.combatStrength - defending.protectionRate)).toInt()
+                val c2 = ceil(defender.amount * (defender.combatStrength - attacking.protectionRate)).toInt()
+                Pair(c1, c2)
+            } else {
+                val c1 = ceil(attacker.amount * (attacker.combatStrength - defending.protectionRate)).toInt()
+                Pair(c1, 0)
+            }
+        }
+        return Pair(0, 0)
+         */
     }
-     */
 }

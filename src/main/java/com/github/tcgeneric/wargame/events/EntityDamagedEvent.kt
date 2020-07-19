@@ -2,18 +2,12 @@ package com.github.tcgeneric.wargame.events
 
 import com.github.tcgeneric.wargame.entity.Entity
 import com.github.tcgeneric.wargame.entity.units.Unit
-import com.github.tcgeneric.wargame.map.Tile
 import org.bukkit.event.Event
 import org.bukkit.event.HandlerList
 
-class UnitInteractionEvent(val unit:Unit, val target:Tile):Event() {
-
+class EntityDamagedEvent(val unit:Entity, val damage:Int):Event() {
     private val handlerList:HandlerList = HandlerList()
     override fun getHandlers(): HandlerList {
         return handlerList
-    }
-
-    override fun getEventName(): String {
-        return super.getEventName()
     }
 }
