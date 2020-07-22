@@ -14,6 +14,11 @@ import kotlin.math.abs
 
 class MapHandler(private val instance:Wargame, private var mapData:MapData) {
 
+    fun setMapData(mapData: MapData) {
+        // TODO: Validate mapdata first.
+        this.mapData = mapData
+    }
+
     fun createEntityOn(entity:Entity, coord:Coordinate):Boolean {
         val tile = mapData.tiles[coordToIdx(coord)]
         if(tile.entity != null)

@@ -2,10 +2,8 @@ package com.github.tcgeneric.wargame.core
 
 import com.github.tcgeneric.wargame.Wargame
 import com.github.tcgeneric.wargame.behaviors.*
-import com.github.tcgeneric.wargame.effects.UnitAttackEffect
-import com.github.tcgeneric.wargame.effects.UnitDivideEffect
-import com.github.tcgeneric.wargame.effects.UnitMergeEffect
-import com.github.tcgeneric.wargame.effects.UnitMoveEffect
+import com.github.tcgeneric.wargame.effects.*
+import com.github.tcgeneric.wargame.entity.units.Unit
 import com.github.tcgeneric.wargame.entity.units.UnitGroup
 import com.github.tcgeneric.wargame.events.TurnCalculationEndEvent
 import com.github.tcgeneric.wargame.events.TurnTimeEndEvent
@@ -20,8 +18,8 @@ class BehaviorHandler(private val instance:Wargame) {
     @EventHandler
     fun onTurnTimeEndEvent(e:TurnTimeEndEvent) {
         sort()
-        behaviorQueue.forEach {
-            handle(it)
+        while(behaviorQueue.peek() != null) {
+            handle(behaviorQueue.pop())
         }
         Bukkit.getServer().pluginManager.callEvent(TurnCalculationEndEvent(e.turn))
     }
@@ -42,9 +40,16 @@ class BehaviorHandler(private val instance:Wargame) {
         return when(behavior) {
             is UnitAttackBehavior -> {
                 // TODO: Needed to change Unitbehavior's parameter.
-                val dmg = instance.unitHandler.getInflictingDamage(behavior.actor, behavior.target)
-                // TODO: Damage entity by using calculated value.
+                val dmgToTarget = instance.unitHandler.getInflictingDamage(behavior.actor, behavior.target)
+                // TODO: Apply damage to unit's actual health value somewhere
                 instance.displayHandler.addReservedEffect(UnitAttackEffect(behavior.actor, behavior.target))
+                        .addReservedEffect(UnitDamageEffect(dmgToTarget))
+                if(behavior.target is Unit && dmgToTarget.after > 0) {
+                    // TODO: This implementation is wrong because this is based on entity's previous undamaged state
+                    val dmgToActor = instance.unitHandler.getInflictingDamage(behavior.actor, behavior.target)
+                    instance.displayHandler.addReservedEffect(UnitAttackEffect(behavior.target, behavior.actor))
+                            .addReservedEffect(UnitDamageEffect(dmgToActor))
+                }
                true
             }
             is UnitDivideBehavior -> {
@@ -66,6 +71,10 @@ class BehaviorHandler(private val instance:Wargame) {
                 false
             }
             is UnitDwellBehavior -> {
+                // TODO: Code goes here
+                false
+            }
+            is UnitBuildBehavior -> {
                 // TODO: Code goes here
                 false
             }

@@ -1,6 +1,7 @@
 package com.github.tcgeneric.wargame.core
 
 import com.github.tcgeneric.wargame.Wargame
+import com.github.tcgeneric.wargame.core.data.DamageResult
 import com.github.tcgeneric.wargame.entity.Entity
 import com.github.tcgeneric.wargame.entity.structures.Structure
 import com.github.tcgeneric.wargame.entity.units.*
@@ -26,6 +27,12 @@ class UnitHandler(private val instance:Wargame) {
             return instance.mapHandler.createEntityOn(newUnit, coord)
         }
         return false
+    }
+
+    fun damage(unit:Unit, damage:Int):DamageResult {
+        if(unit.amount - damage < 0)
+            return DamageResult(unit, unit.amount, 0)
+        return DamageResult(unit, unit.amount, unit.amount - damage)
     }
 
     fun divideUnitTo(unitGroup:UnitGroup, target: Unit, coord:Coordinate):Boolean {
@@ -79,31 +86,12 @@ class UnitHandler(private val instance:Wargame) {
     }
 
     // TODO: This formula is stub. change it later(it doesn't consider tile's protection rate).
-    fun getInflictingDamage(attacker:Entity?, defender:Entity?):Pair<Int, Int> {
-        if(attacker == null || defender == null) return Pair(0, 0)
-        if(attacker is Unit) {
-            return if(defender is Unit) {
-                Pair(attacker.amount * attacker.combatStrength, defender.amount * defender.combatStrength)
-            } else {
-                Pair(attacker.amount * attacker.combatStrength, 0)
-            }
+    fun getInflictingDamage(attacker:Unit, defender:Entity?):DamageResult {
+        if(defender == null) return DamageResult(defender, 0, 0)
+        return when(defender) {
+            is Unit -> DamageResult(defender, defender.amount, attacker.amount * attacker.combatStrength)
+            is Structure -> DamageResult(defender, defender.durability, attacker.amount * attacker.combatStrength)
+            else -> TODO("Not implemented yet")
         }
-        return Pair(0, 0)
-        /*
-        if(attacking.entity == null || defending.entity == null) return Pair(0, 0)
-        if(attacking.entity is Unit) {
-            val attacker = attacking.entity as Unit
-            return if(defending.entity is Unit) {
-                val defender = defending.entity as Unit
-                val c1 = ceil(attacker.amount * (attacker.combatStrength - defending.protectionRate)).toInt()
-                val c2 = ceil(defender.amount * (defender.combatStrength - attacking.protectionRate)).toInt()
-                Pair(c1, c2)
-            } else {
-                val c1 = ceil(attacker.amount * (attacker.combatStrength - defending.protectionRate)).toInt()
-                Pair(c1, 0)
-            }
-        }
-        return Pair(0, 0)
-         */
     }
 }
