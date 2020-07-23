@@ -12,11 +12,24 @@ import org.bukkit.Location
 import org.bukkit.entity.Player
 import kotlin.math.abs
 
-class MapHandler(private val instance:Wargame, private var mapData:MapData) {
+class MapHandler(private val instance:Wargame, private var frame:MapFrame, private var mapData:MapData) {
 
     fun setMapData(mapData: MapData) {
-        // TODO: Validate mapdata first.
+        if(frame.height != mapData.height || frame.width != mapData.width)
+            throw IllegalArgumentException("Given MapData doesn't fit into given MapFrame.")
+        if(instance.isGameStarted)
+            throw IllegalStateException("Cannot change mapdata while game is already started.")
         this.mapData = mapData
+    }
+
+    fun setFrame(frame: MapFrame) {
+        if(frame.height < 0 || frame.width < 0)
+            throw IllegalArgumentException("Frame's height or width cannot be less than 0")
+        if(frame.direction.first == frame.direction.second || frame.direction.first.i + frame.direction.second.i == 0)
+            throw IllegalArgumentException("Invalid direction is given.")
+        if(instance.isGameStarted)
+            throw IllegalStateException("Cannot change mapframe while game is already started.")
+        this.frame = frame
     }
 
     fun createEntityOn(entity:Entity, coord:Coordinate):Boolean {
@@ -74,7 +87,7 @@ class MapHandler(private val instance:Wargame, private var mapData:MapData) {
 
     fun isOnPlayerSight(tile:Tile, player:Player):Boolean {
         val team = instance.teamManager.getPlayerTeam(player) ?: return false
-        if(team.sight.tiles.contains(tile))
+        if(team.sight.hasTile(tile))
             return tile.isSynced
         return false
     }
@@ -88,11 +101,9 @@ class MapHandler(private val instance:Wargame, private var mapData:MapData) {
     }
 
     fun locToCoord(loc:Location):Coordinate {
-        val diff = Coordinate(loc.blockX, loc.blockZ).subtract(mapData.startPoint)
-        if(diff.x < 0) diff.x = 0
-        if(diff.x > mapData.width) diff.x = mapData.width
-        if(diff.z < 0) diff.z = 0
-        if(diff.z > mapData.height) diff.z = mapData.height
+        val diff = Coordinate(loc.blockX, loc.blockZ).subtract(frame.startingPoint)
+        diff.x = diff.x.coerceIn(0, frame.width)
+        diff.z = diff.z.coerceIn(0, frame.height)
         return diff
     }
 

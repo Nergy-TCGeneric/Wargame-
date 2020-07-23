@@ -17,6 +17,13 @@ class UnitHandler(private val instance:Wargame) {
 
     // Assuming that every unit is on its owner(player)'s sight
 
+    fun damage(unit:Unit, damage:Int):DamageResult {
+        if(unit.amount - damage < 0)
+            return DamageResult(unit, unit.amount, 0)
+        return DamageResult(unit, unit.amount, unit.amount - damage)
+    }
+
+    /*
     fun divideUnitTo(unit: Unit, amount:Int, coord:Coordinate):Boolean {
         if(instance.mapHandler.isEntityOnMap(unit) &&
                 amount > 0 &&
@@ -27,12 +34,6 @@ class UnitHandler(private val instance:Wargame) {
             return instance.mapHandler.createEntityOn(newUnit, coord)
         }
         return false
-    }
-
-    fun damage(unit:Unit, damage:Int):DamageResult {
-        if(unit.amount - damage < 0)
-            return DamageResult(unit, unit.amount, 0)
-        return DamageResult(unit, unit.amount, unit.amount - damage)
     }
 
     fun divideUnitTo(unitGroup:UnitGroup, target: Unit, coord:Coordinate):Boolean {
@@ -51,19 +52,15 @@ class UnitHandler(private val instance:Wargame) {
 
     // At first, first unit moves to second unit's position. and then merge happens.
     fun mergeUnit(first:Unit, second:UnitGroup):Boolean {
-        if(instance.mapHandler.isEntityOnMap(first) &&
-                instance.mapHandler.isEntityOnMap(second) &&
-                instance.mapHandler.isNearUnitMoveRange(first, second.first())) {
-            val group = createUnitGroup(first, second)
-            val pos = instance.mapHandler.getEntityCoordinate(second)
-            if(pos != null) {
-                instance.mapHandler.removeEntity(first)
-                instance.mapHandler.removeEntity(second)
-                return instance.mapHandler.createEntityOn(group, pos)
-            }
-        }
-        return false
+        if(!instance.mapHandler.isEntityOnMap(first) || !instance.mapHandler.isEntityOnMap(second)) return false
+        val fCoord = instance.mapHandler.getEntityCoordinate(first) ?: return false
+        val sCoord = instance.mapHandler.getEntityCoordinate(second) ?: return false
+        if(fCoord.manhattanDist(sCoord) < first.moveRange) return false
+        instance.mapHandler.removeEntity(first)
+        instance.mapHandler.removeEntity(second)
+        return instance.mapHandler.createEntityOn(createUnitGroup(first, second), sCoord)
     }
+     */
 
     fun createUnit(type:UnitType, amount:Int):Unit {
         return unitFactory.createUnit(id++, type, amount)

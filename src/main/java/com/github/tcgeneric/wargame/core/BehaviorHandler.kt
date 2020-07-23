@@ -7,6 +7,7 @@ import com.github.tcgeneric.wargame.entity.units.Unit
 import com.github.tcgeneric.wargame.entity.units.UnitGroup
 import com.github.tcgeneric.wargame.events.TurnCalculationEndEvent
 import com.github.tcgeneric.wargame.events.TurnTimeEndEvent
+import com.github.tcgeneric.wargame.util.Coordinate
 import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
 import java.lang.IllegalArgumentException
@@ -21,6 +22,7 @@ class BehaviorHandler(private val instance:Wargame) {
         while(behaviorQueue.peek() != null) {
             handle(behaviorQueue.pop())
         }
+        // TODO: Use an abstracted wargame's method instead
         Bukkit.getServer().pluginManager.callEvent(TurnCalculationEndEvent(e.turn))
     }
 
@@ -52,19 +54,10 @@ class BehaviorHandler(private val instance:Wargame) {
                 }
                true
             }
-            is UnitDivideBehavior -> {
-                val ug = behavior.tile.entity as UnitGroup
-                instance.displayHandler.addReservedEffect(UnitDivideEffect(behavior.actor, ug))
-                true
-            }
-            is UnitMergeBehavior -> {
-                instance.unitHandler.mergeUnit(behavior.actor, behavior.target)
-                instance.displayHandler.addReservedEffect(UnitMergeEffect(behavior.actor, behavior.target))
-                true
-            }
             is UnitMoveBehavior -> {
+                val coord:Coordinate = instance.mapHandler.getEntityCoordinate(behavior.actor) ?: return false
                 if(behavior.tile.passable
-                        && instance.mapHandler.isNearUnitMoveRange(behavior.actor, behavior.tile.coord)) {
+                        && coord.manhattanDist(behavior.tile.coord) >= behavior.actor.moveRange) {
                     instance.mapHandler.moveUnitTo(behavior.actor, behavior.tile.coord)
                     instance.displayHandler.addReservedEffect(UnitMoveEffect(behavior.actor, behavior.tile.coord))
                 }
@@ -78,6 +71,18 @@ class BehaviorHandler(private val instance:Wargame) {
                 // TODO: Code goes here
                 false
             }
+            /*
+            is UnitDivideBehavior -> {
+                val ug = behavior.tile.entity as UnitGroup
+                instance.displayHandler.addReservedEffect(UnitDivideEffect(behavior.actor, ug))
+                true
+            }
+            is UnitMergeBehavior -> {
+                instance.unitHandler.mergeUnit(behavior.actor, behavior.target)
+                instance.displayHandler.addReservedEffect(UnitMergeEffect(behavior.actor, behavior.target))
+                true
+            }
+            */
             else -> throw IllegalArgumentException("Unknown unit behavior type")
         }
     }
