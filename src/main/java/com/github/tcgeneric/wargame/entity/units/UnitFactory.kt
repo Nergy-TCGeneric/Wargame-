@@ -5,8 +5,8 @@ import java.lang.IllegalArgumentException
 class UnitFactory {
     fun createUnitFrom(id:Int, unit:Unit, amount:Int):Unit {
         when(unit) {
-            is WorkerUnit -> return WorkerUnit(id, unit.combatRange, unit.combatStrength, unit.moral, amount, unit.sight, unit.moveRange)
-            is CombatUnit -> return CombatUnit(id, unit.combatRange, unit.combatStrength, unit.moral, amount, unit.sight, unit.moveRange)
+            is WorkerUnit -> return WorkerUnit(id, unit.combatRange, unit.combatStrength, unit.moral, amount, unit.sightRange, unit.moveRange)
+            is CombatUnit -> return CombatUnit(id, unit.combatRange, unit.combatStrength, unit.moral, amount, unit.sightRange, unit.moveRange)
         }
         throw IllegalArgumentException("Wrong unit is given.")
     }
