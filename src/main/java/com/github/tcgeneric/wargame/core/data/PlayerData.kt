@@ -1,6 +1,7 @@
 package com.github.tcgeneric.wargame.core.data
 
 import com.github.tcgeneric.wargame.behaviors.UnitBehavior
+import com.github.tcgeneric.wargame.entity.structures.Structure
 import com.github.tcgeneric.wargame.map.Tile
 import org.bukkit.entity.Player
 
@@ -9,4 +10,6 @@ data class PlayerData(val player:Player) {
     var queuedBehavior: UnitBehavior? = null
     var isDivideMode: Boolean = false
     var divideAmount: Int = 0
+    var isBuildingMode: Boolean = false
+    lateinit var reservedStructure: Structure
 }

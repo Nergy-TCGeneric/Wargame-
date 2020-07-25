@@ -6,17 +6,18 @@ import com.github.tcgeneric.wargame.entity.structures.Structure
 import com.github.tcgeneric.wargame.events.UnitMoveEvent
 import com.github.tcgeneric.wargame.events.TileSelectEvent
 import com.github.tcgeneric.wargame.events.UnitInteractionEvent
-import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
+import org.bukkit.event.Listener
+import java.lang.IllegalStateException
 
-class WargameEventListener(private val instance:Wargame) {
+class WargameEventListener(private val instance:Wargame):Listener {
 
     @EventHandler
     fun onUnitMove(e:UnitMoveEvent) {
         if(!instance.mapHandler.canUnitMoveTo(e.unit, e.tile.coord)) return
-        val b = UnitMoveBehavior(e.unit, e.unit.controller, System.currentTimeMillis(), e.tile)
+        val b = UnitMoveBehavior(e.unit, System.currentTimeMillis(), e.tile)
         instance.behaviorHandler.queue(b)
-        instance.pDataHandler.dataMap[e.unit.controller.uuid]!!.queuedBehavior = b
+        instance.pDataHandler.dataMap[e.unit.controller.uniqueId]!!.queuedBehavior = b
     }
 
     @EventHandler
@@ -30,28 +31,22 @@ class WargameEventListener(private val instance:Wargame) {
     fun onUnitInteraction(e:UnitInteractionEvent) {
         lateinit var b: UnitBehavior
         val currentTime = System.currentTimeMillis()
-        if(e.unit.parentTeam == e.target.entity?.parentTeam) {
-            b = when(val target = e.target.entity) {
-                /*
-                is Unit -> {
-                    val uGroup = instance.unitHandler.createUnitGroup(target)
-                    UnitMergeBehavior(e.unit, e.unit.controller, currentTime, uGroup)
-                }
-                is UnitGroup ->
-                    UnitMergeBehavior(e.unit, e.unit.controller, currentTime, target)
-                 */
-                is Structure ->
-                    UnitDwellBehavior(e.unit, e.unit.controller, currentTime, target)
-                else -> TODO("Not implemented")
-            }
+        val pData = instance.pDataHandler.dataMap[e.unit.controller.uniqueId] ?: throw IllegalStateException("Invalid PlayerData found.")
+        if(pData.isBuildingMode && e.target.entity == null) {
+            b = UnitBuildBehavior(e.unit, currentTime, pData.reservedStructure, e.target)
         } else {
-            val pData = instance.pDataHandler.dataMap[e.unit.controller.uuid]!!
-            b = when(val target = e.target.entity) {
-//                null -> UnitDivideBehavior(e.unit, e.unit.controller, currentTime, e.target, pData.divideAmount)
-                else -> UnitAttackBehavior(e.unit, e.unit.controller, currentTime, target!!)
+            if(e.unit.parentTeam == e.target.entity?.parentTeam) {
+                b = when(val target = e.target.entity) {
+                    is Structure ->
+                        UnitDwellBehavior(e.unit, currentTime, target)
+                    else -> TODO("Not implemented yet")
+                }
+            } else {
+                if(e.target.entity != null)
+                    b = UnitAttackBehavior(e.unit, currentTime, e.target.entity!!)
             }
         }
         instance.behaviorHandler.queue(b)
-        instance.pDataHandler.dataMap[e.unit.controller.uuid]?.queuedBehavior = b
+        instance.pDataHandler.dataMap[e.unit.controller.uniqueId]?.queuedBehavior = b
     }
 }

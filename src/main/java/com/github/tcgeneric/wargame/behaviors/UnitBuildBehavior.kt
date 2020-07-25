@@ -5,4 +5,4 @@ import com.github.tcgeneric.wargame.entity.units.Unit
 import com.github.tcgeneric.wargame.map.Tile
 import org.bukkit.entity.Player
 
-class UnitBuildBehavior(actor:Unit, controller:Player, time:Long, val structure: Structure, val target:Tile):UnitBehavior(actor, controller, time)
+class UnitBuildBehavior(actor:Unit, time:Long, val structure: Structure, val target:Tile):UnitBehavior(actor, time)

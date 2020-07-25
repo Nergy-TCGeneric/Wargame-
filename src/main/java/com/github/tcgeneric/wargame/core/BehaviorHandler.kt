@@ -2,9 +2,8 @@ package com.github.tcgeneric.wargame.core
 
 import com.github.tcgeneric.wargame.Wargame
 import com.github.tcgeneric.wargame.behaviors.*
-import com.github.tcgeneric.wargame.effects.*
+import com.github.tcgeneric.wargame.transitions.*
 import com.github.tcgeneric.wargame.entity.units.Unit
-import com.github.tcgeneric.wargame.entity.units.UnitGroup
 import com.github.tcgeneric.wargame.events.TurnCalculationEndEvent
 import com.github.tcgeneric.wargame.events.TurnTimeEndEvent
 import com.github.tcgeneric.wargame.util.Coordinate
@@ -22,7 +21,6 @@ class BehaviorHandler(private val instance:Wargame) {
         while(behaviorQueue.peek() != null) {
             handle(behaviorQueue.pop())
         }
-        // TODO: Use an abstracted wargame's method instead
         Bukkit.getServer().pluginManager.callEvent(TurnCalculationEndEvent(e.turn))
     }
 
@@ -44,13 +42,13 @@ class BehaviorHandler(private val instance:Wargame) {
                 // TODO: Needed to change Unitbehavior's parameter.
                 val dmgToTarget = instance.unitHandler.getInflictingDamage(behavior.actor, behavior.target)
                 // TODO: Apply damage to unit's actual health value somewhere
-                instance.displayHandler.addReservedEffect(UnitAttackEffect(behavior.actor, behavior.target))
-                        .addReservedEffect(UnitDamageEffect(dmgToTarget))
+                instance.displayHandler.addReservedEffect(UnitAttackTransition(behavior.actor, behavior.target))
+                        .addReservedEffect(UnitDamageTransition(dmgToTarget))
                 if(behavior.target is Unit && dmgToTarget.after > 0) {
                     // TODO: This implementation is wrong because this is based on entity's previous undamaged state
                     val dmgToActor = instance.unitHandler.getInflictingDamage(behavior.actor, behavior.target)
-                    instance.displayHandler.addReservedEffect(UnitAttackEffect(behavior.target, behavior.actor))
-                            .addReservedEffect(UnitDamageEffect(dmgToActor))
+                    instance.displayHandler.addReservedEffect(UnitAttackTransition(behavior.target, behavior.actor))
+                            .addReservedEffect(UnitDamageTransition(dmgToActor))
                 }
                true
             }
@@ -59,7 +57,7 @@ class BehaviorHandler(private val instance:Wargame) {
                 if(behavior.tile.passable
                         && coord.manhattanDist(behavior.tile.coord) >= behavior.actor.moveRange) {
                     instance.mapHandler.moveUnitTo(behavior.actor, behavior.tile.coord)
-                    instance.displayHandler.addReservedEffect(UnitMoveEffect(behavior.actor, behavior.tile.coord))
+                    instance.displayHandler.addReservedEffect(UnitMoveTransition(behavior.actor, behavior.tile.coord))
                 }
                 false
             }

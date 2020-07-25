@@ -6,9 +6,10 @@ import com.github.tcgeneric.wargame.events.*
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
+import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityInteractEvent
 
-class RightClickEventListener(private val instance:Wargame)
+class RightClickEventListener(private val instance:Wargame):Listener
 {
     // Note: This listener doesn't validate ownership of entity
     @EventHandler
