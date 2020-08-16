@@ -9,6 +9,7 @@ import com.github.tcgeneric.wargame.map.MapFrame
 import com.github.tcgeneric.wargame.map.Tile
 import com.github.tcgeneric.wargame.util.Coordinate
 import org.bukkit.Location
+import org.bukkit.World
 import org.bukkit.entity.Player
 
 class MapHandler(private val instance:Wargame, private var frame:MapFrame, private var mapData:MapData) {
@@ -76,11 +77,21 @@ class MapHandler(private val instance:Wargame, private var frame:MapFrame, priva
         return mapData.getTile(coord)
     }
 
+    fun getTileByEntity(entity:Entity): Tile? {
+        val coord = getEntityCoordinate(entity) ?: return null
+        return getTile(coord)
+    }
+
     fun locToCoord(loc:Location):Coordinate {
         val diff = Coordinate(loc.blockX, loc.blockZ).subtract(frame.startingPoint)
         diff.x = diff.x.coerceIn(0, frame.width)
         diff.z = diff.z.coerceIn(0, frame.height)
         return diff
+    }
+
+    fun coordToLoc(world: World, coord:Coordinate):Location {
+        // TODO: Stub value was used. replace it with actual value
+        return Location(world, coord.x.toDouble(), 64.0, coord.z.toDouble())
     }
 
     fun isInsideMap(loc:Location):Boolean {

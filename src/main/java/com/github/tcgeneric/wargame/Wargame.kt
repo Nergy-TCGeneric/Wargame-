@@ -15,19 +15,20 @@ class Wargame:JavaPlugin() {
     val unitHandler = UnitHandler(this)
     val teamManager = TeamManager(this)
     val displayHandler = GraphicManager(this)
+    val schematicLoader = SchematicLoader(this)
     lateinit var mapHandler:MapHandler
 
     var isGameStarted:Boolean = false
     var loaded:Boolean = false
 
     override fun onEnable() {
+        server.pluginManager.registerEvents(RightClickEventListener(this), this)
+        server.pluginManager.registerEvents(WargameEventListener(this), this)
         server.scheduler.runTaskAsynchronously(this) { ->
             val frame = dataLoader.loadMapFrame()
             mapHandler = MapHandler(this, frame, dataLoader.loadMapData(frame))
+            loaded = true
         }
-        server.pluginManager.registerEvents(RightClickEventListener(this), this)
-        server.pluginManager.registerEvents(WargameEventListener(this), this)
-        loaded = true
     }
 
     override fun onDisable() {

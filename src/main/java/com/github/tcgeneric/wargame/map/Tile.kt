@@ -6,11 +6,12 @@ import com.github.tcgeneric.wargame.util.Coordinate
 
 data class Tile(
         var entity:Entity?,
-        val destructible:Boolean,
-        val passable:Boolean,
+        val destructible:Boolean = true,
+        val passable:Boolean = false,
         var durability:Int,
-        val resource:Resource?,
-        var isSynced:Boolean,
+        val resource:Resource? = null,
+        var isSynced:Boolean = false,
         var protectionRate:Float,
-        val coord:Coordinate
+        val coord:Coordinate,
+        val type:TileType
 )
