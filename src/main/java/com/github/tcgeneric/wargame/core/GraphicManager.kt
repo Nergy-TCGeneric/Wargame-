@@ -3,12 +3,12 @@ package com.github.tcgeneric.wargame.core
 import com.github.tcgeneric.wargame.Wargame
 import com.github.tcgeneric.wargame.events.TurnCalculationEndEvent
 import com.github.tcgeneric.wargame.events.TurnCompletionEvent
+import com.github.tcgeneric.wargame.exceptions.InvalidEntityException
 import com.github.tcgeneric.wargame.map.Tile
+import com.github.tcgeneric.wargame.map.TileType
 import com.github.tcgeneric.wargame.teams.Team
 import com.github.tcgeneric.wargame.transitions.*
-import org.bukkit.Bukkit
-import org.bukkit.Particle
-import org.bukkit.Sound
+import org.bukkit.*
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.yaml.snakeyaml.parser.ParserImpl
@@ -21,8 +21,10 @@ class GraphicManager(private val instance:Wargame) {
 
     @EventHandler
     fun onTurnCalculationEndEvent(e:TurnCalculationEndEvent) {
-        for(t in transitionQueue)
+        for(t in transitionQueue) {
             handle(t)
+            // TODO: Delay it for a moment if needed
+        }
         Bukkit.getServer().pluginManager.callEvent(TurnCompletionEvent(e.turn + 1))
     }
 
@@ -36,12 +38,26 @@ class GraphicManager(private val instance:Wargame) {
         return this
     }
 
-    fun drawMap(team:Team) {
-
+    fun drawTeamSight(team:Team) {
+        for(t in team.sight.getTiles().values) {
+            TODO("Use network packet")
+        }
     }
 
-    fun drawGameFrame(controller: Player) {
-
+    fun drawTileGlobally(world:World) {
+        val tiles = instance.mapHandler.getMapTiles()
+        val start = instance.mapHandler.getMapFrame().startingPoint
+        for(t in tiles.values) {
+            val adjusted = start.clone().add(t.coord)
+            val loc = Location(world, adjusted.x.toDouble(), 64.0, adjusted.z.toDouble())
+            loc.clone().subtract(0.0, 1.0, 0.0).block.type = Material.BEDROCK
+            when(t.type) {
+                TileType.PLAINS -> loc.block.type = Material.GRASS
+                TileType.WATER -> loc.block.type = Material.WATER
+                TileType.HILLS -> loc.block.type = Material.COARSE_DIRT
+                TileType.MOUNTAIN -> loc.block.type = Material.COBBLESTONE
+            }
+        }
     }
 
     fun drawTileTo(tile:Tile, team:Team) {
@@ -76,18 +92,17 @@ class GraphicManager(private val instance:Wargame) {
     private fun handle(t:Transition) {
         when(t) {
             is UnitAttackTransition -> {
-                // TODO: Add some delay here
-                val t1 = instance.mapHandler.getTileByEntity(t.unit) ?: throw IllegalStateException()
-                val t2 = instance.mapHandler.getTileByEntity(t.target) ?: throw IllegalStateException()
-                val owner = instance.teamManager.getPlayerTeam(t.unit.controller) ?: throw IllegalStateException()
+                val t1 = instance.mapHandler.getTileByEntity(t.unit) ?: throw InvalidEntityException()
+                val t2 = instance.mapHandler.getTileByEntity(t.target) ?: throw InvalidEntityException()
+                val owner = instance.teamManager.getPlayerTeam(t.unit.controller) ?: throw InvalidEntityException()
                 showTileParticleToTeam(owner, Particle.EXPLOSION_NORMAL, t1)
                 showTileParticleToTeam(owner, Particle.EXPLOSION_NORMAL, t2)
                 playSoundToTeam(owner, Sound.ENTITY_GENERIC_EXPLODE, t1)
             }
             is UnitDamageTransition -> {
                 if(t.damage.damaged == null) return
-                val tile = instance.mapHandler.getTileByEntity(t.damage.damaged) ?: throw IllegalStateException()
-                val owner = instance.teamManager.getPlayerTeam(t.damage.damaged.controller) ?: throw IllegalStateException()
+                val tile = instance.mapHandler.getTileByEntity(t.damage.damaged) ?: throw InvalidEntityException()
+                val owner = instance.teamManager.getPlayerTeam(t.damage.damaged.controller) ?: throw InvalidEntityException()
                 drawTileTo(tile, owner)
             }
             is UnitDivideTransition -> {
@@ -97,7 +112,9 @@ class GraphicManager(private val instance:Wargame) {
                 TODO("Not implemented")
             }
             is UnitMoveTransition -> {
-                TODO("Add unit move animations here")
+                val t1 = instance.mapHandler.getTileByEntity(t.unit)
+                // TODO: Find one of available paths, then move it along
+                TODO("Add unit move animations here by using packet")
             }
         }
     }

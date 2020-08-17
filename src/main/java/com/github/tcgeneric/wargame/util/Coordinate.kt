@@ -23,6 +23,10 @@ data class Coordinate(var x:Int, var z:Int) {
         return abs(x - coord.x ) + abs(z - coord.z )
     }
 
+    fun clone():Coordinate {
+        return Coordinate(x, z)
+    }
+
     override fun equals(other: Any?): Boolean {
         return super.equals(other)
     }

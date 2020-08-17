@@ -11,6 +11,7 @@ import com.github.tcgeneric.wargame.util.Coordinate
 import org.bukkit.Location
 import org.bukkit.World
 import org.bukkit.entity.Player
+import kotlin.math.abs
 
 class MapHandler(private val instance:Wargame, private var frame:MapFrame, private var mapData:MapData) {
 
@@ -30,6 +31,33 @@ class MapHandler(private val instance:Wargame, private var frame:MapFrame, priva
         if(instance.isGameStarted)
             throw IllegalStateException("Cannot change mapframe while game is already started.")
         this.frame = frame
+    }
+
+    fun getMapTiles():HashMap<Coordinate, Tile> {
+        return mapData.getTiles()
+    }
+
+    fun getMapFrame():MapFrame {
+        return frame
+    }
+
+    fun syncSight(sight:MapData) {
+        for(entry in sight.getEntities()) {
+            var cord = entry.key.clone()
+            if(entry.value is Unit) {
+                val sr = (entry.value as Unit).sightRange
+                for(x in 0 until sr) {
+                    for(z in 0 until sr) {
+                        if(abs(x) + abs(z) <= sr) {
+                            cord.add(x, z)
+                            sight.queue(TileChangeRequest(cord, instance.mapHandler.getTile(cord)!!, System.currentTimeMillis()))
+                            cord = entry.key.clone()
+                        }
+                    }
+                }
+            }
+        }
+        sight.apply()
     }
 
     fun createEntityOn(entity:Entity, coord:Coordinate):Boolean {
@@ -97,5 +125,10 @@ class MapHandler(private val instance:Wargame, private var frame:MapFrame, priva
     fun isInsideMap(loc:Location):Boolean {
         val diff = Coordinate(loc.blockX, loc.blockZ).subtract(frame.startingPoint)
         return diff.x >= 0 && diff.x <= frame.width && diff.z >= 0 && diff.z <= frame.height
+    }
+
+    fun findPassage(start:Tile, dest:Tile):List<Coordinate> {
+        TODO("Further implementation required")
+        return listOf()
     }
 }

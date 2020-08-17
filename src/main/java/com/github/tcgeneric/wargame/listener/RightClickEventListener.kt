@@ -17,10 +17,14 @@ class RightClickEventListener(private val instance:Wargame):Listener
         val player = e.entity
         if(player !is Player) return
         val pData = instance.pDataHandler.dataMap[player.uniqueId]
-        val tile = instance.mapHandler.getTile(instance.mapHandler.locToCoord(e.block.location)) ?: return
+        val tile = instance.mapHandler.getTile(instance.mapHandler.locToCoord(e.block.location))
+
+        if(tile == null) {
+            pData?.selectedTile = null
+            return
+        }
         if(!instance.mapHandler.isOnPlayerSight(tile, player)) return
 
-        // TODO: Explicit rule is required
         if(pData?.selectedTile == null) {
             when(tile.entityAbove) {
                 null -> Bukkit.getPluginManager().callEvent(TileSelectEvent(player, tile))
@@ -29,6 +33,8 @@ class RightClickEventListener(private val instance:Wargame):Listener
         } else {
             val pEntity = pData.selectedTile!!.entityAbove
             if(pEntity == tile.entityAbove && pEntity != null) return
+            if(pData.queuedBehavior != null)
+                instance.behaviorHandler.cancel(pData.queuedBehavior!!)
             when(tile.entityAbove) {
                 null -> {
                     if(pEntity is Unit)

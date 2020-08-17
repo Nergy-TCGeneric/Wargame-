@@ -20,6 +20,8 @@ data class MapData(val width:Int, val height:Int, private val tiles:HashMap<Coor
     }
 
     fun apply():Boolean {
+        for(t in tiles.values)
+            t.isSynced = false
         if(requestQueue.isEmpty()) return false
         while(requestQueue.peek() != null) {
             val req = requestQueue.pop()
@@ -27,6 +29,7 @@ data class MapData(val width:Int, val height:Int, private val tiles:HashMap<Coor
             if(entities.containsValue(prevTile?.entityAbove))
                 entities.remove(prevTile?.coord, prevTile?.entityAbove)
             tiles[req.coordinate] = req.newTile
+            tiles[req.coordinate]!!.isSynced = true
             if(req.newTile.entityAbove != null)
                 entities[req.coordinate] = req.newTile.entityAbove!!
         }
