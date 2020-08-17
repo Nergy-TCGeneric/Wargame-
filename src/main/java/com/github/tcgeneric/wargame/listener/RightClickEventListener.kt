@@ -22,14 +22,14 @@ class RightClickEventListener(private val instance:Wargame):Listener
 
         // TODO: Explicit rule is required
         if(pData?.selectedTile == null) {
-            when(tile.entity) {
+            when(tile.entityAbove) {
                 null -> Bukkit.getPluginManager().callEvent(TileSelectEvent(player, tile))
-                else -> Bukkit.getPluginManager().callEvent(EntitySelectEvent(player, tile.entity!!))
+                else -> Bukkit.getPluginManager().callEvent(EntitySelectEvent(player, tile.entityAbove!!))
             }
         } else {
-            val pEntity = pData.selectedTile!!.entity
-            if(pEntity == tile.entity && pEntity != null) return
-            when(tile.entity) {
+            val pEntity = pData.selectedTile!!.entityAbove
+            if(pEntity == tile.entityAbove && pEntity != null) return
+            when(tile.entityAbove) {
                 null -> {
                     if(pEntity is Unit)
                         if(pData.isDivideMode)
@@ -39,7 +39,7 @@ class RightClickEventListener(private val instance:Wargame):Listener
                 }
                 else -> {
                     if(pEntity is Unit)
-                        Bukkit.getPluginManager().callEvent(UnitInteractionEvent(pEntity, tile.entity!!.parentTile!!))
+                        Bukkit.getPluginManager().callEvent(UnitInteractionEvent(pEntity, tile.entityAbove!!.parentTile!!))
                 }
             }
         }

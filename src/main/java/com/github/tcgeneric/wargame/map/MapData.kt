@@ -2,10 +2,8 @@ package com.github.tcgeneric.wargame.map
 
 import com.github.tcgeneric.wargame.core.data.TileChangeRequest
 import com.github.tcgeneric.wargame.entity.Entity
-import com.github.tcgeneric.wargame.entity.structures.ControlPoint
 import com.github.tcgeneric.wargame.util.Coordinate
 import java.util.*
-import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 // Premise : variable 'tiles' must be initialized in ascending order by map generator before using it.
@@ -26,11 +24,11 @@ data class MapData(val width:Int, val height:Int, private val tiles:HashMap<Coor
         while(requestQueue.peek() != null) {
             val req = requestQueue.pop()
             val prevTile = getTile(req.coordinate)
-            if(entities.containsValue(prevTile?.entity))
-                entities.remove(prevTile?.coord, prevTile?.entity)
+            if(entities.containsValue(prevTile?.entityAbove))
+                entities.remove(prevTile?.coord, prevTile?.entityAbove)
             tiles[req.coordinate] = req.newTile
-            if(req.newTile.entity != null)
-                entities[req.coordinate] = req.newTile.entity!!
+            if(req.newTile.entityAbove != null)
+                entities[req.coordinate] = req.newTile.entityAbove!!
         }
         return true
     }

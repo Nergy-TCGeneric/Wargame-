@@ -32,18 +32,18 @@ class WargameEventListener(private val instance:Wargame):Listener {
         lateinit var b: UnitBehavior
         val currentTime = System.currentTimeMillis()
         val pData = instance.pDataHandler.dataMap[e.unit.controller.uniqueId] ?: throw IllegalStateException("Invalid PlayerData found.")
-        if(pData.isBuildingMode && e.target.entity == null) {
+        if(pData.isBuildingMode && e.target.entityAbove == null) {
             b = UnitBuildBehavior(e.unit, currentTime, pData.reservedStructure, e.target)
         } else {
-            if(e.unit.parentTeam == e.target.entity?.parentTeam) {
-                b = when(val target = e.target.entity) {
+            if(e.unit.parentTeam == e.target.entityAbove?.parentTeam) {
+                b = when(val target = e.target.entityAbove) {
                     is Structure ->
                         UnitDwellBehavior(e.unit, currentTime, target)
                     else -> TODO("Not implemented yet")
                 }
             } else {
-                if(e.target.entity != null)
-                    b = UnitAttackBehavior(e.unit, currentTime, e.target.entity!!)
+                if(e.target.entityAbove != null)
+                    b = UnitAttackBehavior(e.unit, currentTime, e.target.entityAbove!!)
             }
         }
         instance.behaviorHandler.queue(b)

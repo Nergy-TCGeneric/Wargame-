@@ -7,11 +7,11 @@ import com.github.tcgeneric.wargame.map.MapGenerator
 import org.bukkit.plugin.java.JavaPlugin
 
 class Wargame:JavaPlugin() {
+    private val dataLoader = DataLoader(this)
+    private val mapGenerator = MapGenerator(this)
     val behaviorHandler = BehaviorHandler(this)
-    val dataLoader = DataLoader(this)
     val pDataHandler = PlayerDataHandler()
     val turnHandler = TurnHandler(this)
-    val mapGenerator = MapGenerator(this)
     val unitHandler = UnitHandler(this)
     val teamManager = TeamManager(this)
     val displayHandler = GraphicManager(this)
@@ -26,7 +26,8 @@ class Wargame:JavaPlugin() {
         server.pluginManager.registerEvents(WargameEventListener(this), this)
         server.scheduler.runTaskAsynchronously(this) { ->
             val frame = dataLoader.loadMapFrame()
-            mapHandler = MapHandler(this, frame, dataLoader.loadMapData(frame))
+            val mapData = dataLoader.loadMapData(frame) ?: mapGenerator.generate(frame.width, frame.height)
+            mapHandler = MapHandler(this, frame, mapData)
             loaded = true
         }
     }

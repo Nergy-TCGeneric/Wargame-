@@ -5,10 +5,10 @@ import com.github.tcgeneric.wargame.util.Coordinate
 import kotlin.random.Random.Default.nextDouble
 
 class MapGenerator(private val instance:Wargame) {
-    fun generate(width:Int, height:Int, seed:Int):MapData {
-        val noises = Array(width + 1) { Array(height + 1) {0.0} }
-        for(i in 0 until width + 1) {
-            for(j in 0 until height + 1) {
+    fun generate(width:Int, height:Int):MapData {
+        val noises = Array(width) { Array(height) {0.0} }
+        for(i in 0 until width) {
+            for(j in 0 until height) {
                 noises[i][j] = nextDouble()
             }
         }
@@ -16,7 +16,14 @@ class MapGenerator(private val instance:Wargame) {
         val result = HashMap<Coordinate, Tile>()
         for(i in 0 until width) {
             for(j in 0 until height) {
-                result[Coordinate(i, j)] = Tile(null, true, false, 0, null, false, 1f, Coordinate(i, j), classify(filtered[i][j], -0.4, 0.35))
+                val coord = Coordinate(i, j)
+                result[coord] = Tile(
+                        entityAbove = null,
+                        isSynced = false,
+                        protectionRate = 1f,
+                        coord = coord,
+                        type = classify(filtered[i][j])
+                )
             }
         }
         return MapData(width, height, result)
@@ -29,12 +36,20 @@ class MapGenerator(private val instance:Wargame) {
                 result[i][j] = (noise[i][j] + noise[i][j+1])/2
             }
         }
+        for(i in 0 until height) {
+            for(j in 0 until width) {
+                result[i][j] = (noise[i+1][j] + noise[i][j])/2
+            }
+        }
         return result
     }
 
-    private fun classify(v:Double, seaLevel:Double, mntLevel:Double):TileType {
-        return if(v < seaLevel) TileType.WATER
-        else if(v >= seaLevel && v < mntLevel) TileType.PLAINS
-        else TileType.MOUNTAIN
+    private fun classify(v:Double):TileType {
+        return when {
+            v < -0.4 -> TileType.WATER
+            v < 0.35 -> TileType.PLAINS
+            v < 0.5 -> TileType.HILLS
+            else -> TileType.MOUNTAIN
+        }
     }
 }

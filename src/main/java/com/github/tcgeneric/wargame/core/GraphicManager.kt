@@ -1,10 +1,8 @@
 package com.github.tcgeneric.wargame.core
 
 import com.github.tcgeneric.wargame.Wargame
-import com.github.tcgeneric.wargame.entity.Entity
 import com.github.tcgeneric.wargame.events.TurnCalculationEndEvent
 import com.github.tcgeneric.wargame.events.TurnCompletionEvent
-import com.github.tcgeneric.wargame.events.UnitMoveEvent
 import com.github.tcgeneric.wargame.map.Tile
 import com.github.tcgeneric.wargame.teams.Team
 import com.github.tcgeneric.wargame.transitions.*
@@ -46,7 +44,7 @@ class GraphicManager(private val instance:Wargame) {
     }
 
     fun drawTileTo(tile:Tile, team:Team) {
-        if(tile.entity == null) return
+        if(tile.entityAbove == null) return
 
     }
 

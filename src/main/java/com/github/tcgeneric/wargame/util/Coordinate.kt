@@ -30,4 +30,8 @@ data class Coordinate(var x:Int, var z:Int) {
     override fun hashCode(): Int {
         return 31 * x * x + 7 * z
     }
+
+    override fun toString(): String {
+        return "({$x}, {$z})"
+    }
 }

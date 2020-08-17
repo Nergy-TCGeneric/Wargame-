@@ -10,12 +10,12 @@ import org.bukkit.configuration.file.YamlConfiguration
 import java.io.File
 
 class DataLoader(private val instance:Wargame) {
-    fun loadMapData(frame:MapFrame):MapData {
+    fun loadMapData(frame:MapFrame):MapData? {
         val file = File(instance.dataFolder, "mapdata.yml")
         val yaml = YamlConfiguration.loadConfiguration(file)
         val tiles:HashMap<Coordinate, Tile> = HashMap()
         val list = yaml.getList("tiles")!!
-        // TODO: Get real value from yaml file
+        TODO("Get real value from yaml file")
         return MapData(frame.width, frame.height, tiles)
     }
 

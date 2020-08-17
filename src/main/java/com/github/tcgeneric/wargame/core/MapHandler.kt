@@ -34,7 +34,7 @@ class MapHandler(private val instance:Wargame, private var frame:MapFrame, priva
 
     fun createEntityOn(entity:Entity, coord:Coordinate):Boolean {
         val tile = mapData.getTile(coord) ?: return false
-        tile.entity = entity
+        tile.entityAbove = entity
         entity.parentTile = tile
         return mapData.queue(TileChangeRequest(coord, tile, System.currentTimeMillis()))
     }
@@ -42,8 +42,8 @@ class MapHandler(private val instance:Wargame, private var frame:MapFrame, priva
     fun removeEntity(entity:Entity):Boolean {
         val coord = mapData.getEntityCoordinate(entity) ?: return false
         val tile = getTile(coord) ?: return false
-        if(tile.entity == null) return false
-        tile.entity = null
+        if(tile.entityAbove == null) return false
+        tile.entityAbove = null
         return mapData.queue(TileChangeRequest(coord, tile, System.currentTimeMillis()))
     }
 
@@ -55,7 +55,7 @@ class MapHandler(private val instance:Wargame, private var frame:MapFrame, priva
 
     fun canUnitMoveTo(unit:Unit, coord:Coordinate):Boolean {
         val uCoord = getEntityCoordinate(unit) ?: return false
-        return getTile(coord)!!.passable && uCoord.manhattanDist(coord) <= unit.moveRange
+        return getTile(coord)!!.entityAbove == null && uCoord.manhattanDist(coord) <= unit.moveRange
     }
 
     fun isEntityOnMap(entity:Entity):Boolean {
