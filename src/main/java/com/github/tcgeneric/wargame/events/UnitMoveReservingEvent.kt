@@ -5,7 +5,7 @@ import com.github.tcgeneric.wargame.map.Tile
 import org.bukkit.event.Event
 import org.bukkit.event.HandlerList
 
-class UnitMoveEvent(val unit:Unit, val tile:Tile):Event() {
+class UnitMoveReservingEvent(val unit:Unit, val tile:Tile):Event() {
 
     private val handlerList:HandlerList = HandlerList()
 

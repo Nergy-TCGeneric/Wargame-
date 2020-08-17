@@ -6,7 +6,7 @@ import com.github.tcgeneric.wargame.map.Tile
 import org.bukkit.event.Event
 import org.bukkit.event.HandlerList
 
-class UnitInteractionEvent(val unit:Unit, val target:Tile):Event() {
+class UnitInteractReservingEvent(val unit:Unit, val target:Tile):Event() {
 
     private val handlerList:HandlerList = HandlerList()
     override fun getHandlers(): HandlerList {

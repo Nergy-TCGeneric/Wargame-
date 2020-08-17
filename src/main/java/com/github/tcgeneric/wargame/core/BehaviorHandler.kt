@@ -54,7 +54,7 @@ class BehaviorHandler(private val instance:Wargame) {
             }
             is UnitMoveBehavior -> {
                 val coord:Coordinate = instance.mapHandler.getEntityCoordinate(behavior.actor) ?: return false
-                if(behavior.tile.passable
+                if(behavior.tile.entityAbove == null
                         && coord.manhattanDist(behavior.tile.coord) >= behavior.actor.moveRange) {
                     instance.mapHandler.moveUnitTo(behavior.actor, behavior.tile.coord)
                     instance.displayHandler.addReservedEffect(UnitMoveTransition(behavior.actor, behavior.tile.coord))

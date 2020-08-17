@@ -16,17 +16,14 @@ class TeamManager(private val instance:Wargame) {
         return null
     }
 
-    fun showTeamSight() {
-
-    }
-
-    /*
-    fun addPlayerTo(player: Player, team:Team):Boolean {
-
+    fun addPlayer(player: Player):Boolean {
+        val playerCount:HashMap<Team, Int> = hashMapOf()
+        for(team in teamList)
+            playerCount[team] = team.players.size
+        TODO("Get team that has minimum player among the teams and make the player join that team")
     }
 
     fun removePlayerFrom(player:Player, team:Team):Boolean {
-
+        return team.players.remove(player)
     }
-     */
 }

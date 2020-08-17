@@ -35,11 +35,11 @@ class RightClickEventListener(private val instance:Wargame):Listener
                         if(pData.isDivideMode)
                             Bukkit.getPluginManager().callEvent(UnitDivideEvent(pEntity, tile, pData.divideAmount))
                         else
-                            Bukkit.getPluginManager().callEvent(UnitMoveEvent(pEntity, tile))
+                            Bukkit.getPluginManager().callEvent(UnitMoveReservingEvent(pEntity, tile))
                 }
                 else -> {
                     if(pEntity is Unit)
-                        Bukkit.getPluginManager().callEvent(UnitInteractionEvent(pEntity, tile.entityAbove!!.parentTile!!))
+                        Bukkit.getPluginManager().callEvent(UnitInteractReservingEvent(pEntity, tile.entityAbove!!.parentTile!!))
                 }
             }
         }

@@ -11,6 +11,7 @@ import org.bukkit.Particle
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
+import org.yaml.snakeyaml.parser.ParserImpl
 import java.util.*
 
 class GraphicManager(private val instance:Wargame) {
@@ -45,21 +46,31 @@ class GraphicManager(private val instance:Wargame) {
 
     fun drawTileTo(tile:Tile, team:Team) {
         if(tile.entityAbove == null) return
-
+        TODO("Further implementation required")
     }
 
-    fun showParticleTo(team:Team, particle:Particle, tile:Tile) {
-        for(p in team.players) {
-            val loc = instance.mapHandler.coordToLoc(p.world, tile.coord)
-            p.spawnParticle(particle, loc, 4) // TODO: Stub value was used. replace it with actual value.
-        }
+    fun showTileParticleToTeam(team:Team, particle:Particle, tile:Tile) {
+        for(p in team.players)
+            showTileParticleToPlayer(p, particle, tile)
     }
 
-    fun playSoundTo(team:Team, sound:Sound, tile:Tile) {
-        for(p in team.players) {
-            val loc = instance.mapHandler.coordToLoc(p.world, tile.coord)
-            p.playSound(loc, sound, 2f, 1f)
-        }
+    fun showTileParticleToPlayer(player:Player, particle:Particle, tile:Tile) {
+        val loc = instance.mapHandler.coordToLoc(player.world, tile.coord)
+        player.spawnParticle(particle, loc, 4) // TODO: Stub value was used. replace it with actual value.
+    }
+
+    fun showDesignatingLine(player:Player, particle:Particle, start:Tile, dest:Tile) {
+        TODO("Implementation required")
+    }
+
+    fun playSoundToTeam(team:Team, sound:Sound, tile:Tile) {
+        for(p in team.players)
+            playSoundToPlayer(p, sound, tile)
+    }
+
+    fun playSoundToPlayer(player:Player, sound:Sound, tile:Tile) {
+        val loc = instance.mapHandler.coordToLoc(player.world, tile.coord)
+        player.playSound(loc, sound, 2f, 1f)
     }
 
     private fun handle(t:Transition) {
@@ -69,9 +80,9 @@ class GraphicManager(private val instance:Wargame) {
                 val t1 = instance.mapHandler.getTileByEntity(t.unit) ?: throw IllegalStateException()
                 val t2 = instance.mapHandler.getTileByEntity(t.target) ?: throw IllegalStateException()
                 val owner = instance.teamManager.getPlayerTeam(t.unit.controller) ?: throw IllegalStateException()
-                showParticleTo(owner, Particle.EXPLOSION_NORMAL, t1)
-                showParticleTo(owner, Particle.EXPLOSION_NORMAL, t2)
-                playSoundTo(owner, Sound.ENTITY_GENERIC_EXPLODE, t1)
+                showTileParticleToTeam(owner, Particle.EXPLOSION_NORMAL, t1)
+                showTileParticleToTeam(owner, Particle.EXPLOSION_NORMAL, t2)
+                playSoundToTeam(owner, Sound.ENTITY_GENERIC_EXPLODE, t1)
             }
             is UnitDamageTransition -> {
                 if(t.damage.damaged == null) return
