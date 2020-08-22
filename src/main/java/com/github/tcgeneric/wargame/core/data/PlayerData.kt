@@ -11,5 +11,5 @@ data class PlayerData(val player:Player) {
     var isDivideMode: Boolean = false
     var divideAmount: Int = 0
     var isBuildingMode: Boolean = false
-    lateinit var reservedStructure: Structure
+    var reservedStructure: Structure? = null
 }

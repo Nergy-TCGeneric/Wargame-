@@ -4,8 +4,9 @@ import org.bukkit.event.Event
 import org.bukkit.event.HandlerList
 
 class StructureBuildCompleteEvent:Event() {
+    private val handler = HandlerList()
     override fun getHandlers(): HandlerList {
-        TODO("Not yet implemented")
+        return handler
     }
 
     override fun getEventName(): String {

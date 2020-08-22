@@ -1,4 +1,4 @@
-package com.github.tcgeneric.wargame.core
+package com.github.tcgeneric.wargame.core.handlers
 
 import com.github.tcgeneric.wargame.Wargame
 import com.github.tcgeneric.wargame.events.TurnCompletionEvent

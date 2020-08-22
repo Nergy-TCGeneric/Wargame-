@@ -5,7 +5,7 @@ import com.github.tcgeneric.wargame.map.Tile
 import com.github.tcgeneric.wargame.teams.Team
 import org.bukkit.entity.Player
 
-abstract class Unit(id:Int, tile:Tile):Entity(id, tile) {
+abstract class Unit(id:Int, tile:Tile, val type:UnitType):Entity(id, tile) {
     var combatRange:Int = 0
     var combatStrength:Int = 0
     var moral:Int = 0

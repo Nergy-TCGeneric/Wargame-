@@ -1,7 +1,8 @@
-package com.github.tcgeneric.wargame.core
+package com.github.tcgeneric.wargame.core.handlers
 
 import com.github.tcgeneric.wargame.core.data.IDGroup
 
+@Deprecated("Not used")
 class IdGroupManager {
     private val groupList:ArrayList<IDGroup> = arrayListOf()
 

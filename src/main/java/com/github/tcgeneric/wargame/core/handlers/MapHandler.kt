@@ -1,4 +1,4 @@
-package com.github.tcgeneric.wargame.core
+package com.github.tcgeneric.wargame.core.handlers
 
 import com.github.tcgeneric.wargame.Wargame
 import com.github.tcgeneric.wargame.core.data.TileChangeRequest
@@ -85,19 +85,15 @@ class MapHandler(private val instance:Wargame, private var frame:MapFrame, priva
         val uCoord = getEntityCoordinate(unit) ?: return false
         return getTile(coord)!!.entityAbove == null && uCoord.manhattanDist(coord) <= unit.moveRange
     }
-
-    fun isEntityOnMap(entity:Entity):Boolean {
-        return mapData.getEntityCoordinate(entity) != null
-    }
     
     fun isOnPlayerSight(tile:Tile, player:Player):Boolean {
-        val team = instance.teamManager.getPlayerTeam(player) ?: return false
+        val team = TeamManager.getPlayerTeam(player) ?: return false
         if(team.sight.hasTile(tile))
             return tile.isSynced
         return false
     }
 
-    fun getEntityCoordinate(entity:Entity):Coordinate? {
+    fun getEntityCoordinate(entity:Entity):Coordinate {
         return mapData.getEntityCoordinate(entity)
     }
 
@@ -106,7 +102,7 @@ class MapHandler(private val instance:Wargame, private var frame:MapFrame, priva
     }
 
     fun getTileByEntity(entity:Entity): Tile? {
-        val coord = getEntityCoordinate(entity) ?: return null
+        val coord = getEntityCoordinate(entity)
         return getTile(coord)
     }
 

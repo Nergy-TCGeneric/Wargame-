@@ -1,32 +1,27 @@
 package com.github.tcgeneric.wargame
 
-import com.github.tcgeneric.wargame.core.*
+import com.github.tcgeneric.wargame.core.handlers.*
 import com.github.tcgeneric.wargame.listener.RightClickEventListener
 import com.github.tcgeneric.wargame.listener.WargameEventListener
 import com.github.tcgeneric.wargame.map.MapGenerator
+import com.github.tcgeneric.wargame.teams.Team
 import org.bukkit.plugin.java.JavaPlugin
 
-class Wargame:JavaPlugin() {
-    private val dataLoader = DataLoader(this)
-    private val mapGenerator = MapGenerator(this)
-    val behaviorHandler = BehaviorHandler(this)
-    val pDataHandler = PlayerDataHandler()
-    val turnHandler = TurnHandler(this)
-    val unitHandler = UnitHandler(this)
-    val teamManager = TeamManager(this)
-    val displayHandler = GraphicManager(this)
-    val schematicLoader = SchematicLoader(this)
-    lateinit var mapHandler:MapHandler
+object Wargame:JavaPlugin() {
+    lateinit var mapHandler: MapHandler
+    lateinit var teams:List<Team>
 
     var isGameStarted:Boolean = false
     var loaded:Boolean = false
 
     override fun onEnable() {
-        server.pluginManager.registerEvents(RightClickEventListener(this), this)
+        server.pluginManager.registerEvents(RightClickEventListener(), this)
         server.pluginManager.registerEvents(WargameEventListener(this), this)
         server.scheduler.runTaskAsynchronously(this) { ->
-            val frame = dataLoader.loadMapFrame()
-            val mapData = dataLoader.loadMapData(frame) ?: mapGenerator.generate(frame.width, frame.height)
+            InitializationManager.loadUnits()
+            teams = InitializationManager.loadTeams()
+            val frame = DataLoader.loadMapFrame()
+            val mapData = DataLoader.loadMapData(frame) ?: MapGenerator.generate(frame.width, frame.height)
             mapHandler = MapHandler(this, frame, mapData)
             loaded = true
         }

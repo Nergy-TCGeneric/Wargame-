@@ -2,6 +2,7 @@ package com.github.tcgeneric.wargame.map
 
 import com.github.tcgeneric.wargame.core.data.TileChangeRequest
 import com.github.tcgeneric.wargame.entity.Entity
+import com.github.tcgeneric.wargame.exceptions.InvalidEntityException
 import com.github.tcgeneric.wargame.util.Coordinate
 import java.util.*
 import kotlin.collections.HashMap
@@ -52,12 +53,12 @@ data class MapData(val width:Int, val height:Int, private val tiles:HashMap<Coor
         return entities[coordinate]
     }
 
-    fun getEntityCoordinate(entity:Entity):Coordinate? {
+    fun getEntityCoordinate(entity:Entity):Coordinate {
         entities.forEach { (t, u) ->
             if(u.id == entity.id)
                 return t
         }
-        return null
+        throw InvalidEntityException()
     }
 
     fun getEntities():HashMap<Coordinate, Entity> {
