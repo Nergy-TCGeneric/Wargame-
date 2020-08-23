@@ -16,12 +16,7 @@ class TurnHandler(private val instance:Wargame) {
     fun onTurnCompletion(e:TurnCompletionEvent) {
         startTimer(20)
         turn = e.turn
-        // TODO: If there's no problem, execute this
         Bukkit.getServer().pluginManager.callEvent(TurnStartEvent(turn))
-    }
-
-    fun getTurn():Int {
-        return turn
     }
 
     fun startTimer(second:Int) {

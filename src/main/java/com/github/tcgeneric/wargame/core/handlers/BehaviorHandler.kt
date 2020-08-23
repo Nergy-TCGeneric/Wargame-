@@ -67,7 +67,8 @@ class BehaviorHandler {
                     false
                 }
                 is UnitBuildBehavior -> {
-                    // TODO: Code goes here
+                    behavior.target.entityAbove = behavior.structure
+                    GraphicManager.transitionQueue.add(UnitBuildTransition(behavior.structure, behavior.target))
                     false
                 }
                 else -> throw IllegalArgumentException("Unknown unit behavior type")

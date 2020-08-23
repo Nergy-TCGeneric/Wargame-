@@ -57,11 +57,11 @@ class WargameEventListener(private val instance:Wargame):Listener {
 
     @EventHandler
     fun onBaseCapture(e:BaseCaptureEvent) {
-
+        e.captured.healthPoint = (e.captured.maxHealthPoint * 0.33).toInt()
     }
 
     @EventHandler
     fun onBehaviorCancellation(e:BehaviorCancellationEvent) {
-
+        BehaviorHandler.cancel(e.behavior)
     }
 }

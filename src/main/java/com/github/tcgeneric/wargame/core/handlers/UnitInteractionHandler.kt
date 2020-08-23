@@ -19,7 +19,7 @@ class UnitInteractionHandler {
             return when (defender) {
                 is Unit -> R * attacker.healthPoint / defender.healthPoint * attacker.combatStrength / dT.protectionRate
                 is Structure -> R * attacker.healthPoint * attacker.combatStrength / dT.protectionRate / defender.toughness
-                else -> TODO("Not implemented yet")
+                else -> throw IllegalArgumentException("Not a valid entity type")
             }
         }
 
