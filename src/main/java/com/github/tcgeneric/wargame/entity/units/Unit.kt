@@ -11,5 +11,4 @@ abstract class Unit(id:Int, tile:Tile, val type:UnitType):Entity(id, tile) {
     var moral:Int = 0
     var moveRange:Int = 0
     var sightRange:Int = 0
-    var amount:Int = 0
 }

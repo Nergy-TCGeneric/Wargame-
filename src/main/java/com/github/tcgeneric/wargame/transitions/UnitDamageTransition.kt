@@ -1,5 +1,5 @@
 package com.github.tcgeneric.wargame.transitions
 
-import com.github.tcgeneric.wargame.core.data.DamageResult
+import com.github.tcgeneric.wargame.entity.Entity
 
-class UnitDamageTransition(val damage:DamageResult):Transition()
+class UnitDamageTransition(val damaged: Entity?):Transition()

@@ -6,7 +6,7 @@ import com.github.tcgeneric.wargame.util.Coordinate
 data class Tile(
         var entityAbove: Entity? = null,
         var isSynced: Boolean = false,
-        var protectionRate: Float,
+        var protectionRate: Double,
         val coord: Coordinate,
         val type: TileType
 )

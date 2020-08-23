@@ -23,7 +23,7 @@ class GraphicManager {
         fun onTurnCalculationEndEvent(e: TurnCalculationEndEvent) {
             for (t in transitionQueue) {
                 handle(t)
-                // TODO: Delay it for a moment if needed
+                Thread.sleep(1000) // TODO: This code is only for experiment and must not be used in production state
             }
             Bukkit.getServer().pluginManager.callEvent(TurnCompletionEvent(e.turn + 1))
         }
@@ -51,7 +51,12 @@ class GraphicManager {
         }
 
         fun drawTileTo(tile: Tile, team: Team) {
-            if (tile.entityAbove == null) return
+            if(tile.entityAbove == null) return
+            if(tile.type == TileType.MOUNTAIN) {
+                for(p in team.players) {
+                    TODO("Use network packet here")
+                }
+            }
             TODO("Further implementation required")
         }
 
@@ -66,7 +71,11 @@ class GraphicManager {
         }
 
         fun showDesignatingLine(player: Player, particle: Particle, start: Tile, dest: Tile) {
-            TODO("Implementation required")
+            val L1 = Wargame.mapHandler.coordToLoc(player.world, start.coord)
+            val L2 = Wargame.mapHandler.coordToLoc(player.world, dest.coord)
+            val diff:Pair<Double, Double> = Pair((L2.x - L1.x)/10, (L2.z - L1.z)/10) // TODO: used stub sample amount
+            for(i in 0..10)
+                player.spawnParticle(particle, L1.add(diff.first, 0.0, diff.second), 4)
         }
 
         fun playSoundToTeam(team: Team, sound: Sound, tile: Tile) {
@@ -90,9 +99,9 @@ class GraphicManager {
                     playSoundToTeam(owner, Sound.ENTITY_GENERIC_EXPLODE, t1)
                 }
                 is UnitDamageTransition -> {
-                    if (t.damage.damaged == null) return
-                    val tile = Wargame.mapHandler.getTileByEntity(t.damage.damaged) ?: throw InvalidEntityException()
-                    val owner = TeamManager.getPlayerTeam(t.damage.damaged.controller)
+                    if (t.damaged == null) return
+                    val tile = Wargame.mapHandler.getTileByEntity(t.damaged) ?: throw InvalidEntityException()
+                    val owner = TeamManager.getPlayerTeam(t.damaged.controller)
                             ?: throw InvalidEntityException()
                     drawTileTo(tile, owner)
                 }

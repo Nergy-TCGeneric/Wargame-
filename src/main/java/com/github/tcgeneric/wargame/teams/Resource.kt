@@ -1,8 +1,8 @@
-package com.github.tcgeneric.wargame
+package com.github.tcgeneric.wargame.teams
 
 import kotlin.math.max
 
-data class Resource(val type:ResourceType, private var amount:Int, private var maxAmount:Int) {
+data class Resource(val type: ResourceType, private var amount:Int, private var maxAmount:Int) {
     fun isAffordable(cost:Int):Boolean {
         return amount >= cost
     }

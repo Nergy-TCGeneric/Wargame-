@@ -1,6 +1,7 @@
 package com.github.tcgeneric.wargame
 
 import com.github.tcgeneric.wargame.core.handlers.*
+import com.github.tcgeneric.wargame.listener.InventoryClickListener
 import com.github.tcgeneric.wargame.listener.RightClickEventListener
 import com.github.tcgeneric.wargame.listener.WargameEventListener
 import com.github.tcgeneric.wargame.map.MapGenerator
@@ -16,13 +17,14 @@ object Wargame:JavaPlugin() {
 
     override fun onEnable() {
         server.pluginManager.registerEvents(RightClickEventListener(), this)
+        server.pluginManager.registerEvents(InventoryClickListener(), this)
         server.pluginManager.registerEvents(WargameEventListener(this), this)
         server.scheduler.runTaskAsynchronously(this) { ->
             InitializationManager.loadUnits()
             teams = InitializationManager.loadTeams()
             val frame = DataLoader.loadMapFrame()
             val mapData = DataLoader.loadMapData(frame) ?: MapGenerator.generate(frame.width, frame.height)
-            mapHandler = MapHandler(this, frame, mapData)
+            mapHandler = MapHandler(frame, mapData)
             loaded = true
         }
     }

@@ -3,7 +3,6 @@ package com.github.tcgeneric.wargame.listener
 import com.github.tcgeneric.wargame.Wargame
 import com.github.tcgeneric.wargame.core.handlers.BehaviorHandler
 import com.github.tcgeneric.wargame.core.handlers.PlayerDataHandler
-import com.github.tcgeneric.wargame.entity.units.Unit
 import com.github.tcgeneric.wargame.events.*
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
@@ -18,10 +17,16 @@ class RightClickEventListener:Listener
         val player = e.entity
         if(player !is Player) return
         val pData = PlayerDataHandler.dataMap[player.uniqueId] ?: return
-        val tile = Wargame.mapHandler.getTile(Wargame.mapHandler.locToCoord(e.block.location)) ?: return
+        val targetTile = Wargame.mapHandler.getTile(Wargame.mapHandler.locToCoord(e.block.location))
 
-        if(!Wargame.mapHandler.isOnPlayerSight(tile, player)) return
+        if(targetTile == null && pData.queuedBehavior != null) {
+            BehaviorHandler.cancel(pData.queuedBehavior!!)
+            Bukkit.getPluginManager().callEvent(BehaviorCancellationEvent(pData.queuedBehavior!!, pData.player))
+            return
+        }
+        if(!Wargame.mapHandler.isOnPlayerSight(targetTile!!, player)) return
         // TODO: Needed to clarify below code
+        /*
         if(pData.selectedTile == null) {
             if(tile.entityAbove == null)
                 Bukkit.getPluginManager().callEvent(TileSelectEvent(player, tile))
@@ -43,6 +48,14 @@ class RightClickEventListener:Listener
                         Bukkit.getPluginManager().callEvent(UnitInteractReservingEvent(pEntity, tile.entityAbove!!.parentTile!!))
                 }
             }
+        }
+         */
+        if(pData.selectedTile == null) {
+            Bukkit.getPluginManager().callEvent(TileSelectEvent(player, targetTile))
+        } else {
+            val selectedEntity = pData.selectedTile?.entityAbove
+            if(selectedEntity == targetTile.entityAbove && selectedEntity != null) return
+            TODO("Writer just got confused. code goes here")
         }
     }
 }

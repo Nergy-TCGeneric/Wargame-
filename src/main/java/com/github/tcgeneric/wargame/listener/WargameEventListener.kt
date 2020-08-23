@@ -2,13 +2,10 @@ package com.github.tcgeneric.wargame.listener
 
 import com.github.tcgeneric.wargame.Wargame
 import com.github.tcgeneric.wargame.behaviors.*
-import com.github.tcgeneric.wargame.core.data.PlayerData
 import com.github.tcgeneric.wargame.core.handlers.BehaviorHandler
 import com.github.tcgeneric.wargame.core.handlers.GraphicManager
 import com.github.tcgeneric.wargame.core.handlers.PlayerDataHandler
-import com.github.tcgeneric.wargame.events.UnitMoveReservingEvent
-import com.github.tcgeneric.wargame.events.TileSelectEvent
-import com.github.tcgeneric.wargame.events.UnitInteractReservingEvent
+import com.github.tcgeneric.wargame.events.*
 import com.github.tcgeneric.wargame.exceptions.InvalidEntityException
 import org.bukkit.Particle
 import org.bukkit.Sound
@@ -51,5 +48,20 @@ class WargameEventListener(private val instance:Wargame):Listener {
         }
         BehaviorHandler.queue(b)
         PlayerDataHandler.dataMap[e.unit.controller.uniqueId]?.queuedBehavior = b
+    }
+
+    @EventHandler
+    fun onEntityDamagedEvent(e:EntityDamagedEvent) {
+
+    }
+
+    @EventHandler
+    fun onBaseCapture(e:BaseCaptureEvent) {
+
+    }
+
+    @EventHandler
+    fun onBehaviorCancellation(e:BehaviorCancellationEvent) {
+
     }
 }

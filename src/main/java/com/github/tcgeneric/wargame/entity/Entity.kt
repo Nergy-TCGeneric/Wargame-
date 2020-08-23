@@ -7,5 +7,7 @@ import org.bukkit.entity.Player
 abstract class Entity(val id:Int, var parentTile: Tile? = null) {
     lateinit var parentTeam: Team
     lateinit var controller: Player
+    var healthPoint:Int = 0
+    var invincible:Boolean = false
     var willRemoved:Boolean = false
 }

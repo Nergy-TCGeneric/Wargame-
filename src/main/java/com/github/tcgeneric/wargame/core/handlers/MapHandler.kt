@@ -13,12 +13,12 @@ import org.bukkit.World
 import org.bukkit.entity.Player
 import kotlin.math.abs
 
-class MapHandler(private val instance:Wargame, private var frame:MapFrame, private var mapData:MapData) {
+class MapHandler(private var frame:MapFrame, private var mapData:MapData) {
 
     fun setMapData(mapData: MapData) {
         if(frame.height != mapData.height || frame.width != mapData.width)
             throw IllegalArgumentException("Given MapData doesn't fit into given MapFrame.")
-        if(instance.isGameStarted)
+        if(Wargame.isGameStarted)
             throw IllegalStateException("Cannot change mapdata while game is already started.")
         this.mapData = mapData
     }
@@ -28,7 +28,7 @@ class MapHandler(private val instance:Wargame, private var frame:MapFrame, priva
             throw IllegalArgumentException("Frame's height or width cannot be less than 0")
         if(frame.direction.first == frame.direction.second || frame.direction.first.i + frame.direction.second.i == 0)
             throw IllegalArgumentException("Invalid direction is given.")
-        if(instance.isGameStarted)
+        if(Wargame.isGameStarted)
             throw IllegalStateException("Cannot change mapframe while game is already started.")
         this.frame = frame
     }
@@ -50,7 +50,7 @@ class MapHandler(private val instance:Wargame, private var frame:MapFrame, priva
                     for(z in 0 until sr) {
                         if(abs(x) + abs(z) <= sr) {
                             cord.add(x, z)
-                            sight.queue(TileChangeRequest(cord, instance.mapHandler.getTile(cord)!!, System.currentTimeMillis()))
+                            sight.queue(TileChangeRequest(cord, getTile(cord)!!, System.currentTimeMillis()))
                             cord = entry.key.clone()
                         }
                     }
