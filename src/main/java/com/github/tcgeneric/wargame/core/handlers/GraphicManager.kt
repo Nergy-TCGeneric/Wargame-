@@ -1,16 +1,12 @@
 package com.github.tcgeneric.wargame.core.handlers
 
 import com.github.tcgeneric.wargame.Wargame
-import com.github.tcgeneric.wargame.events.TurnCalculationEndEvent
-import com.github.tcgeneric.wargame.events.TurnCompletionEvent
 import com.github.tcgeneric.wargame.exceptions.InvalidEntityException
 import com.github.tcgeneric.wargame.map.Tile
 import com.github.tcgeneric.wargame.map.TileType
 import com.github.tcgeneric.wargame.teams.Team
 import com.github.tcgeneric.wargame.transitions.*
 import org.bukkit.*
-import org.bukkit.entity.Player
-import org.bukkit.event.EventHandler
 import java.util.*
 
 class GraphicManager {
@@ -19,10 +15,10 @@ class GraphicManager {
         val transitionQueue: LinkedList<Transition> = LinkedList()
             get() = field
 
-        fun apply(delay:Long) {
-            if(delay < 0) throw IllegalArgumentException("Delay cannot be negative")
+        fun apply(delaymilis:Long) {
+            if(delaymilis < 0) throw IllegalArgumentException("Delay cannot be negative")
             while(transitionQueue.peek() != null) {
-                Thread.sleep(delay) // TODO: This code is only for experiment and must not be used in production state
+                Thread.sleep(delaymilis) // TODO: This code is only for experiment and must not be used in production state
                 handle(transitionQueue.pop())
             }
         }

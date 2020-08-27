@@ -6,13 +6,9 @@ import com.github.tcgeneric.wargame.entity.units.Unit
 import org.bukkit.event.Event
 import org.bukkit.event.HandlerList
 
-class BaseCaptureEvent(val captured:ControlPoint):Event() {
+class BaseCaptureEvent(val captured:ControlPoint, val attacker:Unit):Event() {
     private val handler = HandlerList()
     override fun getHandlers(): HandlerList {
         return handler
-    }
-
-    override fun getEventName(): String {
-        return super.getEventName()
     }
 }

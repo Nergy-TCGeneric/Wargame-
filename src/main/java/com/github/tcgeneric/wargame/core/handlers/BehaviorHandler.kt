@@ -49,7 +49,7 @@ class BehaviorHandler {
             return when (behavior) {
                 is UnitAttackBehavior -> {
                     val dmgToTarget = UnitInteractionHandler.getInflictingDamageRatio(behavior.actor, behavior.target)
-                    UnitInteractionHandler.applyDamageTo(behavior.target, dmgToTarget)
+                    UnitInteractionHandler.applyDamageTo(behavior.actor, behavior.target, dmgToTarget)
                     GraphicManager.transitionQueue.add(UnitAttackTransition(behavior.actor, behavior.target))
                     GraphicManager.transitionQueue.add(UnitDamageTransition(behavior.target))
                     true

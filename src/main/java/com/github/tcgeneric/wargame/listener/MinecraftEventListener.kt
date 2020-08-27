@@ -3,6 +3,7 @@ package com.github.tcgeneric.wargame.listener
 import com.github.tcgeneric.wargame.Wargame
 import com.github.tcgeneric.wargame.core.handlers.BehaviorHandler
 import com.github.tcgeneric.wargame.core.handlers.PlayerDataHandler
+import com.github.tcgeneric.wargame.core.handlers.TeamManager
 import com.github.tcgeneric.wargame.entity.units.Unit
 import com.github.tcgeneric.wargame.events.*
 import org.bukkit.Bukkit
@@ -10,8 +11,9 @@ import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityInteractEvent
+import org.bukkit.event.player.PlayerQuitEvent
 
-class RightClickEventListener:Listener
+class MinecraftEventListener:Listener
 {
     @EventHandler
     fun onRightClickAtEntity(e:EntityInteractEvent) {
@@ -38,5 +40,11 @@ class RightClickEventListener:Listener
                     Bukkit.getPluginManager().callEvent(UnitInteractReservingEvent(selectedEntity, targetTile))
             }
         }
+    }
+
+    @EventHandler
+    fun onPlayerQuit(e:PlayerQuitEvent) {
+        val team = TeamManager.getPlayerTeam(e.player) ?: return
+        team.players.remove(e.player)
     }
 }

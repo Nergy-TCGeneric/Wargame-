@@ -10,6 +10,12 @@ import org.bukkit.entity.Player
 class FeedbackHandler {
     companion object {
 
+        fun broadcastMessage(title:String, message:String) {
+            val teams = TeamManager.getTeams()
+            for (t in teams)
+                showMessageToTeam(t, title, message)
+        }
+
         fun showMessageToTeam(team:Team, title:String, message:String) {
             for (p in team.players)
                 p.sendTitle(title, message, 10, 20, 10)

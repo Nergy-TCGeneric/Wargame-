@@ -23,13 +23,13 @@ class UnitInteractionHandler {
             }
         }
 
-        fun applyDamageTo(victim:Entity, damageRatio:Double) {
+        fun applyDamageTo(attacker:Unit, victim:Entity, damageRatio:Double) {
             victim.healthPoint -= victim.healthPoint * damageRatio.toInt()
             Bukkit.getServer().pluginManager.callEvent(EntityDamagedEvent(victim, damageRatio))
             if(victim.healthPoint < 0) {
                 victim.healthPoint = 0
                 if(victim is ControlPoint)
-                    Bukkit.getServer().pluginManager.callEvent(BaseCaptureEvent(victim))
+                    Bukkit.getServer().pluginManager.callEvent(BaseCaptureEvent(victim, attacker))
                 else
                     victim.willRemoved = true
             }

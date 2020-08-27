@@ -3,7 +3,7 @@ package com.github.tcgeneric.wargame
 import com.github.tcgeneric.wargame.core.handlers.*
 import com.github.tcgeneric.wargame.events.TurnStartEvent
 import com.github.tcgeneric.wargame.listener.InventoryClickListener
-import com.github.tcgeneric.wargame.listener.RightClickEventListener
+import com.github.tcgeneric.wargame.listener.MinecraftEventListener
 import com.github.tcgeneric.wargame.listener.WargameEventListener
 import com.github.tcgeneric.wargame.map.MapGenerator
 import com.github.tcgeneric.wargame.teams.Team
@@ -20,7 +20,7 @@ object Wargame:JavaPlugin() {
     var loaded:Boolean = false
 
     override fun onEnable() {
-        server.pluginManager.registerEvents(RightClickEventListener(), this)
+        server.pluginManager.registerEvents(MinecraftEventListener(), this)
         server.pluginManager.registerEvents(InventoryClickListener(), this)
         server.pluginManager.registerEvents(WargameEventListener(this), this)
         server.scheduler.runTaskAsynchronously(this) { ->
