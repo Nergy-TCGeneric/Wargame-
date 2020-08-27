@@ -3,11 +3,9 @@ package com.github.tcgeneric.wargame.events
 import org.bukkit.event.Event
 import org.bukkit.event.HandlerList
 
-class TurnCalculationEndEvent(): Event() {
-
-    private val handlerList:HandlerList = HandlerList()
-
+class UnitCreationEvent:Event() {
+    private val handler = HandlerList()
     override fun getHandlers(): HandlerList {
-        return handlerList
+        return handler
     }
 }

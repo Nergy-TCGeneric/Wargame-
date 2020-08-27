@@ -1,6 +1,5 @@
 package com.github.tcgeneric.wargame.core.handlers
 
-import com.github.tcgeneric.wargame.Wargame
 import com.github.tcgeneric.wargame.teams.Team
 import org.bukkit.entity.Player
 
@@ -27,6 +26,10 @@ class TeamManager {
 
         fun removePlayerFrom(player: Player, team: Team): Boolean {
             return team.players.remove(player)
+        }
+
+        fun getTeams(): List<Team> {
+            return teamList
         }
     }
 }

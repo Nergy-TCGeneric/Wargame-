@@ -15,13 +15,10 @@ class BehaviorHandler {
     companion object {
         private var behaviorQueue: LinkedList<UnitBehavior> = LinkedList()
 
-        @EventHandler
-        fun onTurnTimeEndEvent(e: TurnTimeEndEvent) {
+        fun apply() {
             sort()
-            while (behaviorQueue.peek() != null) {
+            while(behaviorQueue.peek() != null)
                 handle(behaviorQueue.pop())
-            }
-            Bukkit.getServer().pluginManager.callEvent(TurnCalculationEndEvent(e.turn))
         }
 
         fun queue(behavior: UnitBehavior) {

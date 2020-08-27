@@ -22,7 +22,7 @@ class MapGenerator() {
                     result[coord] = Tile(
                             entityAbove = null,
                             isSynced = false,
-                            protectionRate = 1f,
+                            protectionRate = 1.0,
                             coord = coord,
                             type = classify(filtered[i][j])
                     )

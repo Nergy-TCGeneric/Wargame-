@@ -19,13 +19,12 @@ class GraphicManager {
         val transitionQueue: LinkedList<Transition> = LinkedList()
             get() = field
 
-        @EventHandler
-        fun onTurnCalculationEndEvent(e: TurnCalculationEndEvent) {
-            for (t in transitionQueue) {
-                handle(t)
-                Thread.sleep(1000) // TODO: This code is only for experiment and must not be used in production state
+        fun apply(delay:Long) {
+            if(delay < 0) throw IllegalArgumentException("Delay cannot be negative")
+            while(transitionQueue.peek() != null) {
+                Thread.sleep(delay) // TODO: This code is only for experiment and must not be used in production state
+                handle(transitionQueue.pop())
             }
-            Bukkit.getServer().pluginManager.callEvent(TurnCompletionEvent(e.turn + 1))
         }
 
         fun drawTeamSight(team: Team) {
@@ -60,43 +59,15 @@ class GraphicManager {
             TODO("Further implementation required")
         }
 
-        fun showTileParticleToTeam(team: Team, particle: Particle, tile: Tile) {
-            for (p in team.players)
-                showTileParticleToPlayer(p, particle, tile)
-        }
-
-        fun showTileParticleToPlayer(player: Player, particle: Particle, tile: Tile) {
-            val loc = Wargame.mapHandler.coordToLoc(player.world, tile.coord)
-            player.spawnParticle(particle, loc, 4) // TODO: Stub value was used. replace it with actual value.
-        }
-
-        fun showDesignatingLine(player: Player, particle: Particle, start: Tile, dest: Tile) {
-            val L1 = Wargame.mapHandler.coordToLoc(player.world, start.coord)
-            val L2 = Wargame.mapHandler.coordToLoc(player.world, dest.coord)
-            val diff:Pair<Double, Double> = Pair((L2.x - L1.x)/10, (L2.z - L1.z)/10) // TODO: used stub sample amount
-            for(i in 0..10)
-                player.spawnParticle(particle, L1.add(diff.first, 0.0, diff.second), 4)
-        }
-
-        fun playSoundToTeam(team: Team, sound: Sound, tile: Tile) {
-            for (p in team.players)
-                playSoundToPlayer(p, sound, tile)
-        }
-
-        fun playSoundToPlayer(player: Player, sound: Sound, tile: Tile) {
-            val loc = Wargame.mapHandler.coordToLoc(player.world, tile.coord)
-            player.playSound(loc, sound, 2f, 1f)
-        }
-
         private fun handle(t: Transition) {
             when (t) {
                 is UnitAttackTransition -> {
                     val t1 = Wargame.mapHandler.getTileByEntity(t.unit) ?: throw InvalidEntityException()
                     val t2 = Wargame.mapHandler.getTileByEntity(t.target) ?: throw InvalidEntityException()
                     val owner = TeamManager.getPlayerTeam(t.unit.controller) ?: throw InvalidEntityException()
-                    showTileParticleToTeam(owner, Particle.EXPLOSION_NORMAL, t1)
-                    showTileParticleToTeam(owner, Particle.EXPLOSION_NORMAL, t2)
-                    playSoundToTeam(owner, Sound.ENTITY_GENERIC_EXPLODE, t1)
+                    FeedbackHandler.showTileParticleToTeam(owner, Particle.EXPLOSION_NORMAL, t1)
+                    FeedbackHandler.showTileParticleToTeam(owner, Particle.EXPLOSION_NORMAL, t2)
+                    FeedbackHandler.playSoundToTeam(owner, Sound.ENTITY_GENERIC_EXPLODE, t1)
                 }
                 is UnitDamageTransition -> {
                     if (t.damaged == null) return

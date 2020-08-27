@@ -118,11 +118,6 @@ class MapHandler(private var frame:MapFrame, private var mapData:MapData) {
         return Location(world, coord.x.toDouble(), 64.0, coord.z.toDouble())
     }
 
-    fun isInsideMap(loc:Location):Boolean {
-        val diff = Coordinate(loc.blockX, loc.blockZ).subtract(frame.startingPoint)
-        return diff.x >= 0 && diff.x <= frame.width && diff.z >= 0 && diff.z <= frame.height
-    }
-
     fun findPassage(start:Tile, dest:Tile):List<Coordinate> {
         TODO("Further implementation required")
         return listOf()
